@@ -25,9 +25,9 @@ const HowItWorks = () => {
 
   return (
     <section className="container py-16">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold mb-4">How It Works</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
+      <div className="text-left mb-12">
+        <h2 className="text-2xl font-bold tracking-tight">How It Works</h2>
+        <p className="text-muted-foreground max-w-2xl">
           Getting started with open source contributions is easier than you
           think. Follow these simple steps:
         </p>

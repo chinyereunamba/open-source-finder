@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import ProjectIssues from "@/components/custom/issues";
 import ProjectContributors from "@/components/custom/contributors";
-import GettingStarted from "@/components/custom/getting-started";
+import GettingStarted from "@/components/layout/getting-started";
 import SimilarProjects from "@/components/custom/similar-projects";
 
 export default function ProjectPage({ params }: { params: { id: string } }) {

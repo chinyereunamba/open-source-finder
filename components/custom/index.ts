@@ -6,6 +6,7 @@ import {
   CardDescription,
 } from "../ui/card";
 import Link from "next/link";
+import { Input } from "@/components/ui/input";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ import {
 } from "@/components/ui/select";
 
 export {
+  Input,
   Link,
   Card,
   CardContent,
