@@ -21,9 +21,9 @@ interface Contributor {
 }
 
 export default function ProjectContributors({
-  projectId,
+  url,
 }: {
-  projectId: number;
+  url: string;
 }) {
   const [contributors, setContributors] = useState<Contributor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,9 @@ export default function ProjectContributors({
   useEffect(() => {
     const getContributors = async () => {
       try {
-        const data = await fetchProjectContributors(projectId);
+        const data = await fetchProjectContributors(
+          url
+        );
         setContributors(data);
       } catch (error) {
         console.error("Error fetching contributors:", error);
@@ -42,7 +44,7 @@ export default function ProjectContributors({
     };
 
     getContributors();
-  }, [projectId]);
+  }, [url]);
 
   if (loading) {
     return (
@@ -187,7 +189,7 @@ export default function ProjectContributors({
                 rel="noopener noreferrer"
                 className="group"
               >
-                <Avatar className="w-16 h-16 mb-2 group-hover:ring-2 ring-primary transition-all">
+                <Avatar className="w-16 h-16 mb-2 self-center group-hover:ring-2 ring-primary transition-all">
                   <AvatarImage
                     src={contributor.avatar_url}
                     alt={contributor.login}

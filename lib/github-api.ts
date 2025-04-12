@@ -1,17 +1,25 @@
 // This is a mock API service for demo purposes
 // In a real application, you would use the GitHub API
 
-interface Project {
+export interface Project {
   id: number;
   name: string;
   full_name: string;
   description: string;
   language: string;
+  license: {
+    name: string;
+    url: string;
+  } | null;
   stargazers_count: number;
   forks_count: number;
   open_issues_count: number;
   updated_at: string;
+  created_at: string;
   html_url: string;
+  contributors_url: string;
+  issue_comment_url: string;
+  issues_url: string;
   topics: string[];
 }
 
@@ -30,7 +38,7 @@ interface Issue {
   body: string;
 }
 
-interface Contributor {
+export interface Contributor {
   id: number;
   login: string;
   avatar_url: string;
@@ -38,60 +46,116 @@ interface Contributor {
   contributions: number;
 }
 
-// Mock data - in a real app, this would come from the GitHub API
-export async function fetchFeaturedProjects(): Promise<Project[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  // In a real app, you would fetch from GitHub API
-  // Example: const response = await fetch('https://api.github.com/search/repositories?q=topic:good-first-issue&sort=stars&order=desc')
-
-  return []; // Empty array to trigger the demo data in the component
-}
-
 export async function fetchProjects(): Promise<Project[]> {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
+  const response = await fetch(
+    "https://api.github.com/search/repositories?q=stars:>100+is:public&order=desc&per_page=20",
+    {
+      method: "GET",
+      headers: {
+        Accept:
+          "application/vnd.github.v3+json, application/vnd.github.mercy-preview+json",
+        Authorization: `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
+      },
+    }
+  );
 
-  return []; // Empty array to trigger the demo data in the component
+  if (!response.ok) {
+    throw new Error("Failed to fetch projects");
+  }
+
+  const data = await response.json();
+  return data.items.map((item: any) => ({
+    id: item.id,
+    name: item.name,
+    full_name: item.full_name,
+    description: item.description,
+    language: item.language,
+    stargazers_count: item.stargazers_count,
+    forks_count: item.forks_count,
+    open_issues_count: item.open_issues_count,
+    updated_at: item.updated_at,
+    created_at: item.created_at,
+    html_url: item.html_url,
+    topics: item.topics || [],
+    contributors_url: item.contributors_url,
+    issue_comment_url: item.issue_comment_url,
+    license: item.license,
+    issues_url: item.issues_url,
+  }));
 }
 
-export async function fetchProjectIssues(projectId: number): Promise<Issue[]> {
+export async function fetchProjectIssues(issueUrl: string): Promise<Issue[]> {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  return []; // Empty array to trigger the demo data in the component
+  const issues = await fetch(`${issueUrl}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
+    },
+  });
+  if (!issues.ok) {
+    throw new Error("Failed to fetch issues");
+  }
+  const data = await issues.json();
+  return data.items.map((item: any) => ({
+    id: item.id,
+    number: item.number,
+    title: item.title,
+    html_url: item.html_url,
+    created_at: item.created_at,
+    updated_at: item.updated_at,
+    labels: item.labels,
+    comments: item.comments,
+    body: item.body,
+  }));
 }
 
 export async function fetchProjectContributors(
-  projectId: number
+  url: string
 ): Promise<Contributor[]> {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  return []; // Empty array to trigger the demo data in the component
+  const contributorsRes = await fetch(`${url}`, {
+    headers: {
+      Accept:
+        "application/vnd.github.v3+json, application/vnd.github.mercy-preview+json",
+      Authorization: `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
+    },
+  });
+  if (!contributorsRes.ok) {
+    throw new Error("Failed to fetch contributors");
+  }
+  const data = await contributorsRes.json();
+  return data.map((item: any) => ({
+    id: item.id,
+    login: item.login,
+    avatar_url: item.avatar_url,
+    html_url: item.html_url,
+    contributions: item.contributions,
+  }));
 }
 
-// In a real app, you would implement these functions to call the GitHub API
-// Example:
-/*
 export async function fetchFeaturedProjects(): Promise<Project[]> {
   const response = await fetch(
-    'https://api.github.com/search/repositories?q=topic:good-first-issue&sort=stars&order=desc&per_page=6',
+    "https://api.github.com/search/repositories?q=stars:>100+is:public&order=desc&per_page=6",
     {
+      method: "GET",
       headers: {
-        Accept: 'application/vnd.github.v3+json',
-        // Add your GitHub token if needed
-        // Authorization: `token ${process.env.GITHUB_TOKEN}`
-      }
+        Accept:
+          "application/vnd.github.v3+json, application/vnd.github.mercy-preview+json",
+        Authorization: `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
+      },
     }
-  )
-  
+  );
+
   if (!response.ok) {
-    throw new Error('Failed to fetch projects')
+    throw new Error("Failed to fetch projects");
   }
-  
-  const data = await response.json()
+
+  const data = await response.json();
   return data.items.map((item: any) => ({
     id: item.id,
     name: item.name,
@@ -103,7 +167,6 @@ export async function fetchFeaturedProjects(): Promise<Project[]> {
     open_issues_count: item.open_issues_count,
     updated_at: item.updated_at,
     html_url: item.html_url,
-    topics: item.topics || []
-  }))
+    topics: item.topics || [],
+  }));
 }
-*/

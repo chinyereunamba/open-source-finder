@@ -32,11 +32,13 @@ export default function FeaturedProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     const getProjects = async () => {
       try {
         const data = await fetchFeaturedProjects();
         setProjects(data);
+        console.log(data)
       } catch (error) {
         console.error("Error fetching projects:", error);
       } finally {

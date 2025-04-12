@@ -17,20 +17,24 @@ export default function ProjectsPage() {
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search projects..."
-                className="w-full pl-8 md:w-[300px]"
-              />
-            </div>
             <Button asChild>
               <Link href="/submit">Submit a Project</Link>
             </Button>
           </div>
         </div>
-
+        <div className="flex flex-col space-y-6">
+          <div className="flex justify-between gap-2">
+            <div className="relative text-xl w-full">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search projects..."
+                className="w-full pl-8 sm:w-[300px] md:w-full text-xl"
+              />
+            </div>
+            <Button>Search</Button>
+          </div>
+        </div>
         <FilterBar />
 
         <ProjectList />

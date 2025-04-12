@@ -36,15 +36,16 @@ interface Issue {
   body: string;
 }
 
-export default function ProjectIssues({ projectId }: { projectId: number }) {
+export default function ProjectIssues({ issueUrl }: { issueUrl: string }) {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("good-first-issue");
+  const [filter, setFilter] = useState("all");
 
   useEffect(() => {
     const getIssues = async () => {
       try {
-        const data = await fetchProjectIssues(projectId);
+        const data = await fetchProjectIssues(issueUrl);
+        console.log(data)
         setIssues(data);
       } catch (error) {
         console.error("Error fetching issues:", error);
@@ -54,7 +55,7 @@ export default function ProjectIssues({ projectId }: { projectId: number }) {
     };
 
     getIssues();
-  }, [projectId]);
+  }, [issueUrl]);
 
   if (loading) {
     return (
@@ -178,7 +179,7 @@ export default function ProjectIssues({ projectId }: { projectId: number }) {
         </Select>
       </div>
 
-      {filteredIssues.length === 0 ? (
+      {issues.length === 0 ? (
         <Card>
           <CardContent className="pt-6 flex flex-col items-center justify-center text-center p-6">
             <AlertCircle className="h-8 w-8 text-muted-foreground mb-2" />
@@ -195,7 +196,7 @@ export default function ProjectIssues({ projectId }: { projectId: number }) {
           </CardContent>
         </Card>
       ) : (
-        filteredIssues.map((issue) => (
+        issues.map((issue) => (
           <Card key={issue.id}>
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">

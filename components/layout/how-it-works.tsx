@@ -35,7 +35,7 @@ const HowItWorks = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {steps.map((step, index) => (
-          <Card key={index} className="bg-card">
+          <Card key={index} className="bg-card border-transparent shadow-none hover:shadow-md hover:border-border cursor-pointer transition-all">
             <CardContent className="p-8 text-center">
               <div className="flex justify-center mb-6">{step.icon}</div>
               <h3 className="text-xl font-bold mb-3">{step.title}</h3>
