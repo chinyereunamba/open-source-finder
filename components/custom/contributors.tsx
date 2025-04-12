@@ -1,10 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  ExternalLink,
+} from "./index";
 import { fetchProjectContributors } from "@/lib/github-api";
 
 interface Contributor {

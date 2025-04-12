@@ -7,7 +7,7 @@ import ProjectList from "@/components/custom/list";
 
 export default function ProjectsPage() {
   return (
-    <div className="container px-4 py-8 md:px-6">
+    <div className="container px-4 py-8 md:px-6 mx-auto">
       <div className="flex flex-col space-y-8">
         <div className="flex items-center justify-between">
           <div>

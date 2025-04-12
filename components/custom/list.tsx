@@ -1,12 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Star, GitFork, Clock, MessageSquare } from "lucide-react";
 import { fetchProjects } from "@/lib/github-api";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Badge,
+  Button,
+  Star,
+  GitFork,
+  Clock,
+  MessageSquare,
+  Link,
+} from "./index";
 
 interface Project {
   id: number;
@@ -177,7 +186,7 @@ export default function ProjectList() {
       {demoProjects.map((project) => (
         <Card key={project.id}>
           <div className="flex flex-col md:flex-row">
-            <div className="flex-1 p-6">
+            <div className="flex-1 p-6 ">
               <div className="flex flex-col space-y-1.5">
                 <div className="flex items-center">
                   <Link
@@ -199,7 +208,7 @@ export default function ProjectList() {
                 ))}
               </div>
             </div>
-            <div className="flex flex-row md:flex-col justify-between items-end p-6 border-t md:border-l md:border-t-0">
+            <div className="flex flex-row md:flex-col justify-between items-start p-6 border-t md:border-l md:border-t-0 md:max-w-[350px] w-full ">
               <div className="flex flex-col space-y-3">
                 <div className="flex items-center space-x-1 text-sm">
                   {project.language && (

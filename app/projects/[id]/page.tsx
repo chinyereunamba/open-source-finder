@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import ProjectIssues from "@/components/custom/issues";
 import ProjectContributors from "@/components/custom/contributors";
+import GettingStarted from "@/components/custom/getting-started";
+import SimilarProjects from "@/components/custom/similar-projects";
 
 export default function ProjectPage({ params }: { params: { id: string } }) {
   // In a real app, we would fetch the project data based on the ID
@@ -188,63 +190,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
           </div>
 
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Getting Started</CardTitle>
-                <CardDescription>
-                  How to contribute to this project
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <h3 className="font-medium flex items-center">
-                    <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                    Find an issue
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Look for issues labeled "good-first-issue" or "help-wanted"
-                    to get started.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium flex items-center">
-                    <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                    Fork the repository
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Create your own fork of the project to work on.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium flex items-center">
-                    <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                    Make your changes
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Implement your fix or feature in your forked repository.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium flex items-center">
-                    <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
-                    Submit a pull request
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Open a PR to the main repository with your changes.
-                  </p>
-                </div>
-                <Button variant="outline" className="w-full" asChild>
-                  <a
-                    href={`${project.html_url}/blob/main/CONTRIBUTING.md`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View Contributing Guidelines
-                    <ExternalLink className="ml-1 h-4 w-4" />
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
+            <GettingStarted project={project} />
 
             <Card>
               <CardHeader>
@@ -296,47 +242,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Similar Projects</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Link
-                    href="/projects/3"
-                    className="font-medium hover:underline"
-                  >
-                    microsoft/vscode
-                  </Link>
-                  <p className="text-sm text-muted-foreground">
-                    Visual Studio Code
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Link
-                    href="/projects/8"
-                    className="font-medium hover:underline"
-                  >
-                    vercel/next.js
-                  </Link>
-                  <p className="text-sm text-muted-foreground">
-                    The React Framework for Production
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Link
-                    href="/projects/4"
-                    className="font-medium hover:underline"
-                  >
-                    flutter/flutter
-                  </Link>
-                  <p className="text-sm text-muted-foreground">
-                    Flutter makes it easy and fast to build beautiful apps for
-                    mobile and beyond
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <SimilarProjects />
           </div>
         </div>
       </div>

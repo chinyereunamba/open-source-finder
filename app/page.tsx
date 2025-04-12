@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, Github } from "lucide-react";
+import {  Github } from "lucide-react";
 import FeaturedProjects from "@/components/layout/featured-projects";
 import FilterBar from "@/components/custom/filter-bar";
 import Nav from "@/components/custom/nav";
@@ -20,19 +18,10 @@ export default function Home() {
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">
                   Discover Open Source Projects That Need Your Help
                 </h1>
-                <p className="max-w-[700px] text-muted-foreground md:text-xl">
+                <p className="max-w-[700px] text-muted-foreground md:text-xl mx-auto">
                   Find meaningful projects to contribute to and make an impact
                   in the open source community.
                 </p>
-              </div>
-              <div className="w-full max-w-sm space-y-2">
-                <div className="flex space-x-2">
-                  <Input
-                    type="text"
-                    placeholder="Search by name, language, or topic"
-                  />
-                  <Button type="submit">Search</Button>
-                </div>
               </div>
             </div>
           </div>

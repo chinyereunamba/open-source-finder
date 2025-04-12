@@ -7,17 +7,18 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
+  Badge,
+  Button,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { MessageSquare, AlertCircle, Clock, ExternalLink } from "lucide-react";
+  ExternalLink,
+  Clock,
+  AlertCircle,
+  MessageSquare,
+} from "./index";
 import { fetchProjectIssues } from "@/lib/github-api";
 
 interface Issue {
