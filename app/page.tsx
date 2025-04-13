@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Github, Search } from "lucide-react";
 import FeaturedProjects from "@/components/layout/featured-projects";
 import FilterBar from "@/components/custom/filter-bar";
-import Nav from "@/components/custom/nav";
+import Nav from "@/app/nav";
 import HowItWorks from "@/components/layout/how-it-works";
 import Footer from "@/components/layout/footer";
 
