@@ -28,6 +28,17 @@ import SimilarProjects from "../custom/similar-projects";
 import { Contributor, Project } from "@/lib/github-api";
 
 export default function ProjectDetail({ project }: { project: Project }) {
+  const description = (desc: string | null) => {
+    const maxLength = 100;
+    const ellipsis = "...";
+    if (desc !== null) {
+      const truncatedDesc =
+        desc.length > maxLength ? desc.slice(0, maxLength) + ellipsis : desc;
+
+      return truncatedDesc;
+    }
+    
+  };
   return (
     <div className="container px-4 py-8 md:px-6 mx-auto">
       <div className="flex flex-col space-y-8">
@@ -47,7 +58,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
                 {project.full_name}
               </h1>
               <p className="text-muted-foreground mt-2">
-                {project.description}
+                {description(project.description)}
               </p>
 
               <div className="flex flex-wrap gap-2 mt-4">
@@ -112,14 +123,14 @@ export default function ProjectDetail({ project }: { project: Project }) {
             <Tabs defaultValue="issues">
               <TabsList>
                 <TabsTrigger value="issues">Issues</TabsTrigger>
-                <TabsTrigger value="contributors">Contributors</TabsTrigger>
+                <TabsTrigger value="contributors">Top contributors</TabsTrigger>
                 <TabsTrigger value="readme">README</TabsTrigger>
               </TabsList>
               <TabsContent value="issues" className="mt-4">
-                <ProjectIssues issueUrl={project.issues_url} />
+                <ProjectIssues id={project.id} />
               </TabsContent>
               <TabsContent value="contributors" className="mt-4">
-                <ProjectContributors url={project.contributors_url} />
+                <ProjectContributors projectId={project.id} />
               </TabsContent>
               <TabsContent value="readme" className="mt-4 space-y-4">
                 <h3 className="text-lg font-medium">ReadMe</h3>

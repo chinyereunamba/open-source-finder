@@ -1,5 +1,4 @@
-// This is a mock API service for demo purposes
-// In a real application, you would use the GitHub API
+import { Octokit } from "@octokit/rest";
 
 export interface Project {
   id: number;
@@ -46,27 +45,25 @@ export interface Contributor {
   contributions: number;
 }
 
-export async function fetchProjects(): Promise<Project[]> {
+const octokit = new Octokit({
+  auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN,
+});
+
+export async function fetchProjects(page = 1): Promise<Project[]> {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  const response = await fetch(
-    "https://api.github.com/search/repositories?q=stars:>100+is:public&order=desc&per_page=20",
-    {
-      method: "GET",
-      headers: {
-        Accept:
-          "application/vnd.github.v3+json, application/vnd.github.mercy-preview+json",
-        Authorization: `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
-      },
-    }
-  );
-
-  if (!response.ok) {
+  const response = await octokit.search.repos({
+    q: "public stars:>500+",
+    sort: "stars",
+    order: "desc",
+    per_page: 20,
+    page: page,
+  });
+  if (!response) {
     throw new Error("Failed to fetch projects");
   }
 
-  const data = await response.json();
-  return data.items.map((item: any) => ({
+  return response.data.items.map((item: any) => ({
     id: item.id,
     name: item.name,
     full_name: item.full_name,
@@ -86,56 +83,83 @@ export async function fetchProjects(): Promise<Project[]> {
   }));
 }
 
-export async function fetchProjectIssues(issueUrl: string): Promise<Issue[]> {
+export async function fetchProjectIssues(projectId: number): Promise<Issue[]> {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  const issues = await fetch(`${issueUrl}`, {
-    method: "GET",
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
-    },
-  });
-  if (!issues.ok) {
-    throw new Error("Failed to fetch issues");
+  try {
+    const repoResponse = await octokit.request(
+      "GET /repositories/{repository_id}",
+      {
+        repository_id: projectId,
+      }
+    );
+
+    const [owner, repo] = repoResponse.data.full_name.split("/");
+
+    // Then fetch issues for that repository
+    const issuesResponse = await octokit.issues.listForRepo({
+      owner,
+      repo,
+      state: "open",
+      per_page: 5,
+      sort: "created",
+    });
+
+    return issuesResponse.data.map((item: any) => ({
+      id: item.id,
+      number: item.number,
+      title: item.title,
+      html_url: item.html_url,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+      labels: item.labels.map((label: any) => ({
+        name: label.name,
+        color: label.color,
+      })),
+      comments: item.comments,
+      body: item.body || "",
+    }));
+  } catch (error) {
+    console.error("Error fetching project issues:", error);
+    return [];
   }
-  const data = await issues.json();
-  return data.items.map((item: any) => ({
-    id: item.id,
-    number: item.number,
-    title: item.title,
-    html_url: item.html_url,
-    created_at: item.created_at,
-    updated_at: item.updated_at,
-    labels: item.labels,
-    comments: item.comments,
-    body: item.body,
-  }));
 }
 
 export async function fetchProjectContributors(
-  url: string
+  projectId: number
 ): Promise<Contributor[]> {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  const contributorsRes = await fetch(`${url}`, {
-    headers: {
-      Accept:
-        "application/vnd.github.v3+json, application/vnd.github.mercy-preview+json",
-      Authorization: `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
-    },
-  });
-  if (!contributorsRes.ok) {
-    throw new Error("Failed to fetch contributors");
+
+  try {
+    // First, get the repository details to extract owner and repo name
+    const repoResponse = await octokit.request(
+      "GET /repositories/{repository_id}",
+      {
+        repository_id: projectId,
+      }
+    );
+
+    const [owner, repo] = repoResponse.data.full_name.split("/");
+
+    // Then fetch contributors for that repository
+    const contributorsResponse = await octokit.repos.listContributors({
+      owner,
+      repo,
+      per_page: 10,
+    });
+
+    return contributorsResponse.data.map((item: any) => ({
+      id: item.id,
+      login: item.login,
+      avatar_url: item.avatar_url,
+      html_url: item.html_url,
+      contributions: item.contributions,
+    }));
+  } catch (error) {
+    console.error("Error fetching project contributors:", error);
+    return []; 
   }
-  const data = await contributorsRes.json();
-  return data.map((item: any) => ({
-    id: item.id,
-    login: item.login,
-    avatar_url: item.avatar_url,
-    html_url: item.html_url,
-    contributions: item.contributions,
-  }));
 }
 
 export async function fetchFeaturedProjects(): Promise<Project[]> {

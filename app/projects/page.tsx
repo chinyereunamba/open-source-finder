@@ -6,6 +6,7 @@ import FilterBar from "@/components/custom/filter-bar";
 import ProjectList from "@/components/custom/list";
 
 export default function ProjectsPage() {
+
   return (
     <div className="container px-4 py-8 md:px-6 mx-auto">
       <div className="flex flex-col space-y-8">
@@ -39,16 +40,7 @@ export default function ProjectsPage() {
 
         <ProjectList />
 
-        <div className="flex items-center justify-center space-x-2">
-          <Button variant="outline" size="sm" disabled>
-            <ArrowLeft className="mr-1 h-4 w-4" />
-            Previous
-          </Button>
-          <Button variant="outline" size="sm">
-            Next
-            <ArrowRight className="ml-1 h-4 w-4" />
-          </Button>
-        </div>
+        
       </div>
     </div>
   );

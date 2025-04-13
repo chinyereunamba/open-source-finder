@@ -21,9 +21,9 @@ interface Contributor {
 }
 
 export default function ProjectContributors({
-  url,
+  projectId,
 }: {
-  url: string;
+  projectId: number;
 }) {
   const [contributors, setContributors] = useState<Contributor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +33,7 @@ export default function ProjectContributors({
     const getContributors = async () => {
       try {
         const data = await fetchProjectContributors(
-          url
+          projectId
         );
         setContributors(data);
       } catch (error) {
@@ -44,7 +44,7 @@ export default function ProjectContributors({
     };
 
     getContributors();
-  }, [url]);
+  }, [projectId]);
 
   if (loading) {
     return (

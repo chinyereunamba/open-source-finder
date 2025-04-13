@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { fetchProjects } from "@/lib/github-api";
 
+import { useSearchParams } from "next/navigation";
+
 import {
   Card,
   CardContent,
@@ -16,6 +18,8 @@ import {
   MessageSquare,
   Link,
 } from "./index";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import PaginationControls from "./pagination-buttons";
 
 interface Project {
   id: number;
@@ -34,11 +38,14 @@ interface Project {
 export default function ProjectList() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page") || "1");
 
   useEffect(() => {
     const getProjects = async () => {
+      setLoading(true);
       try {
-        const data = await fetchProjects();
+        const data = await fetchProjects(page);
         setProjects(data);
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -48,7 +55,7 @@ export default function ProjectList() {
     };
 
     getProjects();
-  }, []);
+  }, [page]);
 
   if (loading) {
     return (
@@ -179,73 +186,86 @@ export default function ProjectList() {
             html_url: "https://github.com/vercel/next.js",
             topics: ["react", "framework", "javascript", "help-wanted"],
           },
-        ];
+      ];
+   const description = (desc: string | null) => {
+     const maxLength = 100;
+     const ellipsis = "...";
+     if (desc !== null) {
+       const truncatedDesc =
+         desc.length > maxLength ? desc.slice(0, maxLength) + ellipsis : desc;
+
+       return truncatedDesc;
+     }
+   };
 
   return (
-    <div className="grid gap-4">
-      {demoProjects.map((project) => (
-        <Card key={project.id}>
-          <div className="flex flex-col md:flex-row">
-            <div className="flex-1 p-6 ">
-              <div className="flex flex-col space-y-1.5">
-                <div className="flex items-center">
-                  <Link
-                    href={`/projects/${project.id}`}
-                    className="hover:underline"
-                  >
-                    <h3 className="text-2xl font-semibold leading-none tracking-tight">
-                      {project.full_name}
-                    </h3>
-                  </Link>
+    <>
+      <div className="grid gap-4">
+        {demoProjects.map((project) => (
+          <Card key={project.id}>
+            <div className="flex flex-col md:flex-row">
+              <div className="flex-1 p-6 ">
+                <div className="flex flex-col space-y-1.5">
+                  <div className="flex items-center">
+                    <Link
+                      href={`/projects/${project.id}`}
+                      className="hover:underline"
+                    >
+                      <h3 className="text-2xl font-semibold leading-none tracking-tight">
+                        {project.full_name}
+                      </h3>
+                    </Link>
+                  </div>
+                  <p className="text-muted-foreground">{description(project.description)}</p>
                 </div>
-                <p className="text-muted-foreground">{project.description}</p>
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {project.topics.map((topic) => (
+                    <Badge key={topic} variant="secondary">
+                      {topic}
+                    </Badge>
+                  ))}
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2 mt-4">
-                {project.topics.map((topic) => (
-                  <Badge key={topic} variant="secondary">
-                    {topic}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-            <div className="flex flex-row md:flex-col justify-between items-start p-6 border-t md:border-l md:border-t-0 md:max-w-[350px] w-full ">
-              <div className="flex flex-col space-y-3">
-                <div className="flex items-center space-x-1 text-sm">
-                  {project.language && (
+              <div className="flex flex-row md:flex-col justify-between items-start p-6 border-t md:border-l md:border-t-0 md:max-w-[350px] w-full ">
+                <div className="flex flex-col space-y-3">
+                  <div className="flex items-center space-x-1 text-sm">
+                    {project.language && (
+                      <div className="flex items-center gap-1 mr-3">
+                        <span className="relative flex h-3 w-3">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                        </span>
+                        <span>{project.language}</span>
+                      </div>
+                    )}
                     <div className="flex items-center gap-1 mr-3">
-                      <span className="relative flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-                      </span>
-                      <span>{project.language}</span>
+                      <Star className="h-4 w-4" />
+                      <span>{formatNumber(project.stargazers_count)}</span>
                     </div>
-                  )}
-                  <div className="flex items-center gap-1 mr-3">
-                    <Star className="h-4 w-4" />
-                    <span>{formatNumber(project.stargazers_count)}</span>
+                    <div className="flex items-center gap-1 mr-3">
+                      <GitFork className="h-4 w-4" />
+                      <span>{formatNumber(project.forks_count)}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <MessageSquare className="h-4 w-4" />
+                      <span>{formatNumber(project.open_issues_count)}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 mr-3">
-                    <GitFork className="h-4 w-4" />
-                    <span>{formatNumber(project.forks_count)}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <MessageSquare className="h-4 w-4" />
-                    <span>{formatNumber(project.open_issues_count)}</span>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Clock className="h-4 w-4 mr-1" />
+                    <span>Updated {formatDate(project.updated_at)}</span>
                   </div>
                 </div>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4 mr-1" />
-                  <span>Updated {formatDate(project.updated_at)}</span>
-                </div>
+                <Button size="sm" asChild className="mt-4">
+                  <Link href={`/projects/${project.id}`}>View Project</Link>
+                </Button>
               </div>
-              <Button size="sm" asChild className="mt-4">
-                <Link href={`/projects/${project.id}`}>View Project</Link>
-              </Button>
             </div>
-          </div>
-        </Card>
-      ))}
-    </div>
+          </Card>
+        ))}
+      </div>
+      <PaginationControls currentPage={page} />
+    </>
   );
 }
 

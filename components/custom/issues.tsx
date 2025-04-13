@@ -36,7 +36,7 @@ interface Issue {
   body: string;
 }
 
-export default function ProjectIssues({ issueUrl }: { issueUrl: string }) {
+export default function ProjectIssues({ id }: { id: number }) {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -44,8 +44,8 @@ export default function ProjectIssues({ issueUrl }: { issueUrl: string }) {
   useEffect(() => {
     const getIssues = async () => {
       try {
-        const data = await fetchProjectIssues(issueUrl);
-        console.log(data)
+        const data = await fetchProjectIssues(id);
+        console.log(data);
         setIssues(data);
       } catch (error) {
         console.error("Error fetching issues:", error);
@@ -55,7 +55,7 @@ export default function ProjectIssues({ issueUrl }: { issueUrl: string }) {
     };
 
     getIssues();
-  }, [issueUrl]);
+  }, [id]);
 
   if (loading) {
     return (

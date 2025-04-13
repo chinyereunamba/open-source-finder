@@ -1,4 +1,3 @@
-"use client";
 import ProjectDetail from "@/components/layout/project-detail";
 import {
   fetchProjectContributors,
@@ -6,7 +5,6 @@ import {
   Project,
 } from "@/lib/github-api";
 import { notFound } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
 
 type PageProps = {
   params: {
@@ -14,27 +12,10 @@ type PageProps = {
   };
 };
 
-export default function ProjectPage({ params }:any) {
-  const [project, setProject] = useState<Project>();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const getProjects = async () => {
-      try {
-        const data = await fetchProjects();
-        const res = data?.find(
-          (proj) => proj.id === Number.parseInt(params.id)
-        );
-        setProject(res as Project);
-      } catch (error) {
-        console.error("Error fetching issues:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getProjects();
-  }, []);
+export default async function ProjectPage({ params }: any) {
+  const param = await params;
+  const data = await fetchProjects();
+  const project = data?.find((proj) => proj.id === Number.parseInt(param.id));
 
   if (!project) {
     return <div>Project not found</div>;
