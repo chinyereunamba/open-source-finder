@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Search, ArrowLeft, ArrowRight } from "lucide-react";
 import FilterBar from "@/components/custom/filter-bar";
 import ProjectList from "@/components/custom/list";
+import { Suspense } from "react";
 
 export default function ProjectsPage() {
 
@@ -37,8 +38,9 @@ export default function ProjectsPage() {
           </div>
         </div>
         <FilterBar />
-
+        <Suspense fallback={<div>Loading projects...</div>}>
         <ProjectList />
+        </Suspense>
 
         
       </div>

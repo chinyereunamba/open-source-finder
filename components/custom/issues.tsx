@@ -45,7 +45,6 @@ export default function ProjectIssues({ id }: { id: number }) {
     const getIssues = async () => {
       try {
         const data = await fetchProjectIssues(id);
-        console.log(data);
         setIssues(data);
       } catch (error) {
         console.error("Error fetching issues:", error);

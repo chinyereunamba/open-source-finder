@@ -83,6 +83,38 @@ export async function fetchProjects(page = 1): Promise<Project[]> {
   }));
 }
 
+export async function fetchProject(projectId: number): Promise<Project | null> {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  try {
+    const response = await octokit.request(
+      "GET /repositories/{repository_id}",
+      {
+        repository_id: projectId,
+      }
+    );
+    return response.data
+  } catch (error) {
+    console.error("Error fetching project issues:", error);
+    return null;
+  }
+}
+
+export async function fetchProjectReadme(projectId: number): Promise<string> {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  try {
+    const response = await octokit.request(
+      "GET /repositories/{repository_id}/readme",
+      {
+        repository_id: projectId,
+      }
+    );
+    return response.data.content;
+  } catch (error) {
+    console.error("Error fetching project readme:", error);
+    return "";
+  }
+}
 export async function fetchProjectIssues(projectId: number): Promise<Issue[]> {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -158,7 +190,7 @@ export async function fetchProjectContributors(
     }));
   } catch (error) {
     console.error("Error fetching project contributors:", error);
-    return []; 
+    return [];
   }
 }
 

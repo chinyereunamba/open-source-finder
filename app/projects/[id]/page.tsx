@@ -1,5 +1,6 @@
 import ProjectDetail from "@/components/layout/project-detail";
 import {
+  fetchProject,
   fetchProjectContributors,
   fetchProjects,
   Project,
@@ -14,8 +15,7 @@ type PageProps = {
 
 export default async function ProjectPage({ params }: any) {
   const param = await params;
-  const data = await fetchProjects();
-  const project = data?.find((proj) => proj.id === Number.parseInt(param.id));
+  const project = await fetchProject(param.id);
 
   if (!project) {
     return <div>Project not found</div>;
