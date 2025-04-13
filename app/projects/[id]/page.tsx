@@ -14,7 +14,7 @@ type PageProps = {
   };
 };
 
-export default function ProjectPage({ params }: PageProps) {
+export default function ProjectPage({ params }:any) {
   const [project, setProject] = useState<Project>();
   const [loading, setLoading] = useState(true);
 
