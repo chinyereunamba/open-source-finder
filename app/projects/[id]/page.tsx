@@ -3,15 +3,18 @@ import { fetchProjectContributors, fetchProjects } from "@/lib/github-api";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+type PageProps = {
+  params: {
+    id: string;
+  };
+};
+
 export default async function ProjectPage({
   params,
-}: {
-  params: { id: string };
-}) {
-  const param = await params;
+}: PageProps) {
   const projects = await fetchProjects();
   const project = projects.find(
-    (proj) => proj.id === Number.parseInt(param.id)
+    (proj) => proj.id === Number.parseInt(params.id)
   );
 
   console.log(project?.issues_url);
