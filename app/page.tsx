@@ -2,16 +2,16 @@ import Link from "next/link";
 import { Github, Search } from "lucide-react";
 import FeaturedProjects from "@/components/layout/featured-projects";
 import FilterBar from "@/components/custom/filter-bar";
-import Nav from "@/app/nav";
 import HowItWorks from "@/components/layout/how-it-works";
 import Footer from "@/components/layout/footer";
 
 import { Button, Input } from "@/components/custom";
+import Header from "@/app/header";
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <Nav />
+      <Header />
 
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
