@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Github, Search } from "lucide-react";
+import { Github, Search, Sparkles, Users } from "lucide-react";
 import FeaturedProjects from "@/components/layout/featured-projects";
 import FilterBar from "@/components/custom/filter-bar";
 import HowItWorks from "@/components/layout/how-it-works";
@@ -29,6 +29,56 @@ export default function Home() {
             </div>
           </div>
         </section>
+        {/* Features Section */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl font-bold  mb-12 text-gray-900 dark:text-white">
+              Why Contribute to Open Source?
+            </h2>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+                <div className="w-12 h-12 mx-auto flex items-center justify-center bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full mb-4">
+                  <Sparkles className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
+                  Improve Your Skills
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Work on real-world projects, learn from experienced
+                  developers, and improve your coding skills.
+                </p>
+              </div>
+
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+                <div className="w-12 h-12 mx-auto flex items-center justify-center bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400 rounded-full mb-4">
+                  <Users className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
+                  Build Your Network
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Connect with like-minded developers, collaborate on projects,
+                  and build meaningful relationships.
+                </p>
+              </div>
+
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+                <div className="w-12 h-12 mx-auto flex items-center justify-center bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-full mb-4">
+                  <Github className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
+                  Make an Impact
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Help build software used by millions of developers worldwide
+                  and make a lasting impact on the community.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="container px-4 md:px-6 mx-auto mt-6">
           <div className="flex flex-col space-y-6">
             <h2 className="text-2xl font-bold tracking-tight">

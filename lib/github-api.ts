@@ -6,7 +6,7 @@ export interface Project {
   full_name: string;
   description: string;
   language: string;
-  license: {
+  license?: {
     name: string;
     url: string;
   } | null;
@@ -14,11 +14,11 @@ export interface Project {
   forks_count: number;
   open_issues_count: number;
   updated_at: string;
-  created_at: string;
+  created_at?: string;
   html_url: string;
-  contributors_url: string;
-  issue_comment_url: string;
-  issues_url: string;
+  contributors_url?: string;
+  issue_comment_url?: string;
+  issues_url?: string;
   topics: string[];
 }
 
@@ -92,7 +92,7 @@ export async function fetchProject(projectId: number): Promise<Project | null> {
         repository_id: projectId,
       }
     );
-    return response.data
+    return response.data;
   } catch (error) {
     console.error("Error fetching project issues:", error);
     return null;
@@ -195,24 +195,19 @@ export async function fetchProjectContributors(
 }
 
 export async function fetchFeaturedProjects(): Promise<Project[]> {
-  const response = await fetch(
-    "https://api.github.com/search/repositories?q=stars:>100+is:public&order=desc&per_page=6",
-    {
-      method: "GET",
-      headers: {
-        Accept:
-          "application/vnd.github.v3+json, application/vnd.github.mercy-preview+json",
-        Authorization: `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
-      },
-    }
-  );
-
-  if (!response.ok) {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  const response = await octokit.search.repos({
+    q: "stars:>1000+ topic:good-first-issue",
+    sort: "stars",
+    order: "desc",
+    per_page: 6,
+  });
+  console.log("Trending:", response);
+  if (!response.data) {
     throw new Error("Failed to fetch projects");
   }
 
-  const data = await response.json();
-  return data.items.map((item: any) => ({
+  return response.data.items.map((item: any) => ({
     id: item.id,
     name: item.name,
     full_name: item.full_name,
@@ -222,6 +217,7 @@ export async function fetchFeaturedProjects(): Promise<Project[]> {
     forks_count: item.forks_count,
     open_issues_count: item.open_issues_count,
     updated_at: item.updated_at,
+    created_at: item.created_at,
     html_url: item.html_url,
     topics: item.topics || [],
   }));
