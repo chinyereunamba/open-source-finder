@@ -14,9 +14,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Search, Github, Bell, User, Settings, LogOut } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
 
 export default function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { data: session, status } = useSession();
+  const isLoggedIn = !!session;
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -75,10 +77,16 @@ export default function Header() {
                   >
                     <Avatar className="h-8 w-8">
                       <AvatarImage
-                        src="/placeholder.svg?height=32&width=32"
-                        alt="@sarahjohnson"
+                        src={
+                          session?.user?.image ||
+                          "/placeholder.svg?height=32&width=32"
+                        }
+                        alt={session?.user?.name || "User"}
                       />
-                      <AvatarFallback>SJ</AvatarFallback>
+                      <AvatarFallback>
+                        {session?.user?.name?.substring(0, 2).toUpperCase() ||
+                          "US"}
+                      </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -86,10 +94,10 @@ export default function Header() {
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        Sarah Johnson
+                        {session?.user?.name || "User"}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground">
-                        @sarahjohnson
+                        {session?.user?.email || ""}
                       </p>
                     </div>
                   </DropdownMenuLabel>
@@ -107,7 +115,9 @@ export default function Header() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setIsLoggedIn(false)}>
+                  <DropdownMenuItem
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                   </DropdownMenuItem>
