@@ -3,16 +3,11 @@ import { Github, Search, Sparkles, Users } from "lucide-react";
 import FeaturedProjects from "@/components/layout/featured-projects";
 import FilterBar from "@/components/custom/filter-bar";
 import HowItWorks from "@/components/layout/how-it-works";
-import Footer from "@/components/layout/footer";
-
-import { Button, Input } from "@/components/custom";
-import Header from "@/app/header";
+import SearchBarHome from "@/components/SearchBarHome";
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
-
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
           <div className="container px-4 md:px-6 mx-auto">
@@ -84,17 +79,7 @@ export default function Home() {
             <h2 className="text-2xl font-bold tracking-tight">
               Browse open source projects
             </h2>
-            <div className="flex justify-between gap-2">
-              <div className="relative text-xl w-full">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search projects..."
-                  className="w-full pl-8 sm:w-[300px] md:w-full text-xl"
-                />
-              </div>
-              <Button>Search</Button>
-            </div>
+            <SearchBarHome />
           </div>
         </section>
 
@@ -111,7 +96,7 @@ export default function Home() {
                 View all projects
               </Link>
             </div>
-            <FilterBar />
+            {/* <FilterBar /> */}
             <FeaturedProjects />
           </div>
         </section>

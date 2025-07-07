@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Github, Mail, ArrowRight, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -31,8 +32,20 @@ export default function VerifyEmailPage() {
     "",
   ]);
 
-  // Mock email for demo purposes
-  const userEmail = "example@email.com";
+  const { data: session } = useSession();
+  const userEmail = session?.user?.email || "";
+  if (!userEmail) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-2xl font-bold mb-4">
+          You must be signed in to verify your email.
+        </h2>
+        <Link href="/auth/sign-in">
+          <Button>Sign In</Button>
+        </Link>
+      </div>
+    );
+  }
 
   const handleInputChange = (index: number, value: string) => {
     // Only allow numbers

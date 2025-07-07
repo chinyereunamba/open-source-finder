@@ -1,12 +1,36 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, ArrowLeft, ArrowRight } from "lucide-react";
 import FilterBar from "@/components/custom/filter-bar";
 import ProjectList from "@/components/custom/list";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
 export default function ProjectsPage() {
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("All");
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(e.target.value);
+  };
+
+  const handleSearch = () => {
+    setSearch(searchInput);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  const clearFilters = () => {
+    setSelectedLanguage("All");
+    setSelectedTopics([]);
+  };
 
   return (
     <div className="container px-4 py-8 md:px-6 mx-auto">
@@ -32,17 +56,28 @@ export default function ProjectsPage() {
                 type="search"
                 placeholder="Search projects..."
                 className="w-full pl-8 sm:w-[300px] md:w-full text-xl"
+                value={searchInput}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
               />
             </div>
-            <Button>Search</Button>
+            <Button onClick={handleSearch}>Search</Button>
           </div>
         </div>
-        <FilterBar />
+        <FilterBar
+          selectedLanguage={selectedLanguage}
+          setSelectedLanguage={setSelectedLanguage}
+          selectedTopics={selectedTopics}
+          setSelectedTopics={setSelectedTopics}
+          clearFilters={clearFilters}
+        />
         <Suspense fallback={<div>Loading projects...</div>}>
-        <ProjectList />
+          <ProjectList
+            search={search}
+            language={selectedLanguage}
+            topics={selectedTopics}
+          />
         </Suspense>
-
-        
       </div>
     </div>
   );

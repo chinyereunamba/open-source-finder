@@ -49,11 +49,27 @@ const octokit = new Octokit({
   auth: process.env.NEXT_PUBLIC_GITHUB_TOKEN,
 });
 
-export async function fetchProjects(page = 1): Promise<Project[]> {
+export async function fetchProjects(
+  page = 1,
+  search = "",
+  language = "All",
+  topics: string[] = []
+): Promise<Project[]> {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
+  let query = search
+    ? `${search} in:name,description public stars:>500+`
+    : "public stars:>500+";
+  if (language && language !== "All") {
+    query += ` language:${language}`;
+  }
+  if (topics && topics.length > 0) {
+    for (const topic of topics) {
+      query += ` topic:${topic}`;
+    }
+  }
   const response = await octokit.search.repos({
-    q: "public stars:>500+",
+    q: query,
     sort: "stars",
     order: "desc",
     per_page: 20,

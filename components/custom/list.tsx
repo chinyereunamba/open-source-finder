@@ -35,7 +35,17 @@ interface Project {
   topics: string[];
 }
 
-export default function ProjectList() {
+interface ProjectListProps {
+  search?: string;
+  language?: string;
+  topics?: string[];
+}
+
+export default function ProjectList({
+  search = "",
+  language = "All",
+  topics = [],
+}: ProjectListProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
@@ -45,7 +55,7 @@ export default function ProjectList() {
     const getProjects = async () => {
       setLoading(true);
       try {
-        const data = await fetchProjects(page);
+        const data = await fetchProjects(page, search, language, topics);
         setProjects(data);
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -55,7 +65,7 @@ export default function ProjectList() {
     };
 
     getProjects();
-  }, [page]);
+  }, [page, search, language, topics]);
 
   if (loading) {
     return (
@@ -186,22 +196,26 @@ export default function ProjectList() {
             html_url: "https://github.com/vercel/next.js",
             topics: ["react", "framework", "javascript", "help-wanted"],
           },
-      ];
-   const description = (desc: string | null) => {
-     const maxLength = 100;
-     const ellipsis = "...";
-     if (desc !== null) {
-       const truncatedDesc =
-         desc.length > maxLength ? desc.slice(0, maxLength) + ellipsis : desc;
+        ];
+  const description = (desc: string | null) => {
+    const maxLength = 100;
+    const ellipsis = "...";
+    if (desc !== null) {
+      const truncatedDesc =
+        desc.length > maxLength ? desc.slice(0, maxLength) + ellipsis : desc;
 
-       return truncatedDesc;
-     }
-   };
+      return truncatedDesc;
+    }
+  };
+
+  // Only filter by search on the client for demoProjects fallback
+  const sourceProjects = projects.length > 0 ? projects : demoProjects;
+  const filteredProjects = sourceProjects;
 
   return (
     <>
       <div className="grid gap-4">
-        {demoProjects.map((project) => (
+        {filteredProjects.map((project) => (
           <Card key={project.id}>
             <div className="flex flex-col md:flex-row">
               <div className="flex-1 p-6 ">
@@ -216,7 +230,9 @@ export default function ProjectList() {
                       </h3>
                     </Link>
                   </div>
-                  <p className="text-muted-foreground">{description(project.description)}</p>
+                  <p className="text-muted-foreground">
+                    {description(project.description)}
+                  </p>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-4">
                   {project.topics.map((topic) => (

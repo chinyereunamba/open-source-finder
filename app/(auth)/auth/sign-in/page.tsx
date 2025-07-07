@@ -18,6 +18,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Github } from "lucide-react";
 import { toast } from "sonner";
+import { signIn, useSession } from "next-auth/react";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -27,6 +28,17 @@ export default function SignInPage() {
     password: "",
     rememberMe: true,
   });
+
+  const { data: session } = useSession();
+
+  if (session) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-2xl font-bold mb-4">You are already signed in!</h2>
+        <Button onClick={() => router.push("/")}>Go to Home</Button>
+      </div>
+    );
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,28 +58,15 @@ export default function SignInPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    // Simulate authentication
-    setTimeout(() => {
-      setIsLoading(false);
-
-      // For demo purposes, any credentials will work
-      toast("Sign in successful. Welcome back to Open Source Finder!");
-
-      router.push("/");
-    }, 1500);
+    // Use next-auth signIn
+    const res = await signIn("github", { callbackUrl: "/" });
+    setIsLoading(false);
+    // No need for simulated timeout or toast here
   };
 
   const handleGitHubSignIn = () => {
     setIsLoading(true);
-
-    // Simulate GitHub OAuth
-    setTimeout(() => {
-      setIsLoading(false);
-      toast("GitHub sign in successful. Welcome back to Open Source Finder!");
-
-      router.push("/");
-    }, 1500);
+    signIn("github", { callbackUrl: "/" });
   };
 
   return (
@@ -84,7 +83,7 @@ export default function SignInPage() {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
           <CardDescription>
-            Enter your email and password to access your account
+            Sign in with your GitHub account to access your account
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -100,67 +99,6 @@ export default function SignInPage() {
               Sign in with GitHub
             </Button>
           </div>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <Separator className="w-full" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="m@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                disabled={isLoading}
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                disabled={isLoading}
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="rememberMe"
-                checked={formData.rememberMe}
-                onCheckedChange={handleCheckboxChange}
-                disabled={isLoading}
-              />
-              <Label htmlFor="rememberMe" className="text-sm font-normal">
-                Remember me for 30 days
-              </Label>
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in"}
-            </Button>
-          </form>
         </CardContent>
         <CardFooter className="flex flex-col">
           <p className="text-center text-sm text-muted-foreground">

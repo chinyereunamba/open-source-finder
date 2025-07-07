@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Badge,
   Button,
@@ -12,7 +11,6 @@ import {
   Filter,
   X,
 } from "./index";
-
 
 const languages = [
   "All",
@@ -41,21 +39,27 @@ const topics = [
   "web",
 ];
 
-export default function FilterBar() {
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("All");
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+interface FilterBarProps {
+  selectedLanguage: string;
+  setSelectedLanguage: (lang: string) => void;
+  selectedTopics: string[];
+  setSelectedTopics: (topics: string[]) => void;
+  clearFilters: () => void;
+}
 
+export default function FilterBar({
+  selectedLanguage,
+  setSelectedLanguage,
+  selectedTopics,
+  setSelectedTopics,
+  clearFilters,
+}: FilterBarProps) {
   const handleTopicClick = (topic: string) => {
     if (selectedTopics.includes(topic)) {
       setSelectedTopics(selectedTopics.filter((t) => t !== topic));
     } else {
       setSelectedTopics([...selectedTopics, topic]);
     }
-  };
-
-  const clearFilters = () => {
-    setSelectedLanguage("All");
-    setSelectedTopics([]);
   };
 
   return (

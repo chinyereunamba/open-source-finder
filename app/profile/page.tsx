@@ -35,76 +35,52 @@ import UserContributions from "@/components/custom/user-contributions";
 import UserProjects from "@/components/custom/user-projects";
 import UserActivity from "@/components/custom/user-activity";
 import RecommendedProjects from "@/components/custom/recommended-projects";
+import { useSession } from "next-auth/react";
 
 export default function ProfilePage() {
-  const [user] = useState({
-    username: "sarahjohnson",
-    name: "Sarah Johnson",
-    avatar: "/placeholder.svg?height=200&width=200",
-    bio: "Full-stack developer passionate about open source. Contributing to React, Next.js, and TypeScript projects. Always learning and sharing knowledge with the community.",
-    location: "San Francisco, CA",
-    joinedDate: "January 2020",
-    socialLinks: {
-      github: "https://github.com/sarahjohnson",
-      twitter: "https://twitter.com/sarahjohnson",
-      linkedin: "https://linkedin.com/in/sarahjohnson",
-      website: "https://sarahjohnson.dev",
-      email: "sarah@example.com",
-    },
-    stats: {
-      contributions: 247,
-      pullRequests: 83,
-      issuesReported: 56,
-      projectsContributed: 12,
-    },
-    badges: [
-      {
-        id: 1,
-        name: "Top Contributor",
-        description: "Among the top 5% of contributors",
-        icon: "Award",
-        date: "June 2023",
-      },
-      {
-        id: 2,
-        name: "Bug Hunter",
-        description: "Reported and fixed 50+ bugs",
-        icon: "CheckCircle2",
-        date: "March 2023",
-      },
-      {
-        id: 3,
-        name: "Documentation Hero",
-        description: "Improved documentation in 10+ projects",
-        icon: "BookOpen",
-        date: "January 2023",
-      },
-      {
-        id: 4,
-        name: "First Pull Request",
-        description: "Successfully merged your first PR",
-        icon: "GitFork",
-        date: "February 2020",
-      },
-    ],
-    skills: [
-      "JavaScript",
-      "TypeScript",
-      "React",
-      "Next.js",
-      "Node.js",
-      "GraphQL",
-      "CSS",
-      "Tailwind",
-    ],
-    languages: [
-      { name: "JavaScript", percentage: 40 },
-      { name: "TypeScript", percentage: 30 },
-      { name: "HTML/CSS", percentage: 15 },
-      { name: "Python", percentage: 10 },
-      { name: "Other", percentage: 5 },
-    ],
-  });
+  const { data: session } = useSession();
+  if (!session) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-2xl font-bold mb-4">
+          You must be signed in to view your profile.
+        </h2>
+        <Link href="/auth/sign-in">
+          <Button>Sign In</Button>
+        </Link>
+      </div>
+    );
+  }
+  const user = session.user as
+    | (typeof session.user & {
+        username?: string;
+        location?: string;
+        createdAt?: string;
+        socialLinks?: {
+          github?: string;
+          twitter?: string;
+          linkedin?: string;
+          website?: string;
+          email?: string;
+        };
+        bio?: string;
+        stats?: {
+          contributions?: number;
+          pullRequests?: number;
+          issuesReported?: number;
+          projectsContributed?: number;
+        };
+        skills?: string[];
+        languages?: { name: string; percentage: number }[];
+        badges?: {
+          id: number;
+          name: string;
+          description: string;
+          icon: string;
+          date: string;
+        }[];
+      })
+    | undefined;
 
   const getBadgeIcon = (iconName: string) => {
     switch (iconName) {
@@ -132,27 +108,29 @@ export default function ProfilePage() {
                 <div className="flex flex-col items-center text-center">
                   <Avatar className="h-24 w-24 mb-4">
                     <AvatarImage
-                      src={user.avatar || "/placeholder.svg"}
-                      alt={user.name}
+                      src={user?.image || "/placeholder.svg"}
+                      alt={user?.name || "User"}
                     />
                     <AvatarFallback>
-                      {user.name.substring(0, 2).toUpperCase()}
+                      {user?.name?.substring(0, 2).toUpperCase() || "US"}
                     </AvatarFallback>
                   </Avatar>
-                  <h2 className="text-2xl font-bold">{user.name}</h2>
-                  <p className="text-muted-foreground">@{user.username}</p>
+                  <h2 className="text-2xl font-bold">{user?.name || "User"}</h2>
+                  <p className="text-muted-foreground">
+                    @{user?.username || "username"}
+                  </p>
                   <div className="flex items-center mt-2 text-sm text-muted-foreground">
                     <MapPin className="h-4 w-4 mr-1" />
-                    <span>{user.location}</span>
+                    <span>{user?.location || ""}</span>
                   </div>
                   <div className="flex items-center mt-1 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4 mr-1" />
-                    <span>Joined {user.joinedDate}</span>
+                    <span>Joined {user?.createdAt?.substring(0, 4) || ""}</span>
                   </div>
                   <div className="flex justify-center mt-4 space-x-2">
                     <Button variant="outline" size="icon" asChild>
                       <a
-                        href={user.socialLinks.github}
+                        href={user?.socialLinks?.github || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -162,7 +140,7 @@ export default function ProfilePage() {
                     </Button>
                     <Button variant="outline" size="icon" asChild>
                       <a
-                        href={user.socialLinks.twitter}
+                        href={user?.socialLinks?.twitter || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -172,7 +150,7 @@ export default function ProfilePage() {
                     </Button>
                     <Button variant="outline" size="icon" asChild>
                       <a
-                        href={user.socialLinks.linkedin}
+                        href={user?.socialLinks?.linkedin || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -182,7 +160,7 @@ export default function ProfilePage() {
                     </Button>
                     <Button variant="outline" size="icon" asChild>
                       <a
-                        href={user.socialLinks.website}
+                        href={user?.socialLinks?.website || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -191,7 +169,7 @@ export default function ProfilePage() {
                       </a>
                     </Button>
                     <Button variant="outline" size="icon" asChild>
-                      <a href={`mailto:${user.socialLinks.email}`}>
+                      <a href={`mailto:${user?.email || ""}`}>
                         <Mail className="h-4 w-4" />
                         <span className="sr-only">Email</span>
                       </a>
@@ -214,7 +192,7 @@ export default function ProfilePage() {
                 <CardTitle>About</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm">{user.bio}</p>
+                <p className="text-sm">{user?.bio || "No bio provided."}</p>
               </CardContent>
             </Card>
 
@@ -227,7 +205,7 @@ export default function ProfilePage() {
                   <div className="flex flex-col items-center p-3 bg-muted rounded-lg">
                     <Code className="h-5 w-5 mb-1 text-primary" />
                     <span className="text-xl font-bold">
-                      {user.stats.contributions}
+                      {user?.stats?.contributions ?? 0}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       Contributions
@@ -236,7 +214,7 @@ export default function ProfilePage() {
                   <div className="flex flex-col items-center p-3 bg-muted rounded-lg">
                     <GitFork className="h-5 w-5 mb-1 text-primary" />
                     <span className="text-xl font-bold">
-                      {user.stats.pullRequests}
+                      {user?.stats?.pullRequests ?? 0}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       Pull Requests
@@ -245,7 +223,7 @@ export default function ProfilePage() {
                   <div className="flex flex-col items-center p-3 bg-muted rounded-lg">
                     <MessageSquare className="h-5 w-5 mb-1 text-primary" />
                     <span className="text-xl font-bold">
-                      {user.stats.issuesReported}
+                      {user?.stats?.issuesReported ?? 0}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       Issues
@@ -254,7 +232,7 @@ export default function ProfilePage() {
                   <div className="flex flex-col items-center p-3 bg-muted rounded-lg">
                     <Star className="h-5 w-5 mb-1 text-primary" />
                     <span className="text-xl font-bold">
-                      {user.stats.projectsContributed}
+                      {user?.stats?.projectsContributed ?? 0}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       Projects
@@ -270,7 +248,7 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {user.skills.map((skill) => (
+                  {(user?.skills || []).map((skill) => (
                     <Badge key={skill} variant="secondary">
                       {skill}
                     </Badge>
@@ -284,7 +262,7 @@ export default function ProfilePage() {
                 <CardTitle>Languages</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {user.languages.map((language) => (
+                {(user?.languages || []).map((language) => (
                   <div key={language.name} className="space-y-1">
                     <div className="flex justify-between text-sm">
                       <span>{language.name}</span>
@@ -319,7 +297,7 @@ export default function ProfilePage() {
               </TabsContent>
               <TabsContent value="badges" className="mt-6">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {user.badges.map((badge) => (
+                  {(user?.badges || []).map((badge) => (
                     <Card key={badge.id}>
                       <CardContent className="pt-6">
                         <div className="flex items-start gap-4">

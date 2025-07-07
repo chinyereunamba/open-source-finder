@@ -16,7 +16,7 @@ import {
 import { Search, Github, Bell, User, Settings, LogOut } from "lucide-react";
 
 export default function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -115,7 +115,9 @@ export default function Header() {
               </DropdownMenu>
             </div>
           ) : (
-            <Button>Sign In</Button>
+            <Button asChild>
+              <Link href="/auth/sign-in">Sign In</Link>
+            </Button>
           )}
         </div>
       </div>
