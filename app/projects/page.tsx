@@ -1,36 +1,41 @@
 "use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, ArrowLeft, ArrowRight } from "lucide-react";
-import FilterBar from "@/components/custom/filter-bar";
-import ProjectList from "@/components/custom/list";
+import EnhancedProjectList from "@/components/custom/enhanced-project-list";
+import EnhancedFilterBar from "@/components/custom/enhanced-filter-bar";
+import { FilterOptions } from "@/components/custom/advanced-filter-panel";
 import { Suspense, useState } from "react";
+
+const defaultFilters: FilterOptions = {
+  languages: [],
+  topics: [],
+  difficulty: [],
+  status: [],
+  sortBy: "stars",
+  sortOrder: "desc",
+};
 
 export default function ProjectsPage() {
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("All");
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [filters, setFilters] = useState<FilterOptions>(defaultFilters);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value);
+  const handleSearch = (query: string) => {
+    setSearch(query);
   };
 
-  const handleSearch = () => {
-    setSearch(searchInput);
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
+  const handleFiltersChange = (newFilters: FilterOptions) => {
+    setFilters(newFilters);
   };
 
-  const clearFilters = () => {
-    setSelectedLanguage("All");
-    setSelectedTopics([]);
-  };
+  // Convert new filter format to legacy format for EnhancedProjectList
+  const selectedLanguage =
+    filters.languages.length > 0 ? filters.languages[0] : "All";
+  const selectedTopics = filters.topics;
 
   return (
     <div className="container px-4 py-8 md:px-6 mx-auto">
@@ -48,31 +53,17 @@ export default function ProjectsPage() {
             </Button>
           </div>
         </div>
-        <div className="flex flex-col space-y-6">
-          <div className="flex justify-between gap-2">
-            <div className="relative text-xl w-full">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search projects..."
-                className="w-full pl-8 sm:w-[300px] md:w-full text-xl"
-                value={searchInput}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-              />
-            </div>
-            <Button onClick={handleSearch}>Search</Button>
-          </div>
-        </div>
-        <FilterBar
-          selectedLanguage={selectedLanguage}
-          setSelectedLanguage={setSelectedLanguage}
-          selectedTopics={selectedTopics}
-          setSelectedTopics={setSelectedTopics}
-          clearFilters={clearFilters}
+
+        <EnhancedFilterBar
+          searchValue={searchInput}
+          onSearchChange={handleSearchChange}
+          onSearch={handleSearch}
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
         />
+
         <Suspense fallback={<div>Loading projects...</div>}>
-          <ProjectList
+          <EnhancedProjectList
             search={search}
             language={selectedLanguage}
             topics={selectedTopics}

@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Star,
   GitFork,
@@ -22,6 +23,12 @@ import {
   ExternalLink,
   Github,
   Search,
+  Bookmark,
+  Share2,
+  Eye,
+  Users,
+  Grid3X3,
+  List,
 } from "lucide-react";
 import {
   Select,
@@ -41,6 +48,7 @@ export {
   CardDescription,
   Badge,
   Button,
+  Checkbox,
   Select,
   SelectContent,
   SelectItem,
@@ -59,4 +67,10 @@ export {
   Avatar,
   AvatarFallback,
   AvatarImage,
+  Bookmark,
+  Share2,
+  Eye,
+  Users,
+  Grid3X3,
+  List,
 };

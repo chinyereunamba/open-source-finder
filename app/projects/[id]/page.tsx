@@ -1,4 +1,4 @@
-import ProjectDetail from "@/components/layout/project-detail";
+import EnhancedProjectDetail from "@/components/layout/enhanced-project-detail";
 import {
   fetchProject,
   fetchProjectContributors,
@@ -18,13 +18,19 @@ export default async function ProjectPage({ params }: any) {
   const project = await fetchProject(param.id);
 
   if (!project) {
-    return <div>Project not found</div>;
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-muted-foreground">
+            Project not found
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            The project you're looking for doesn't exist.
+          </p>
+        </div>
+      </div>
+    );
   }
 
-  const fullProject = {
-    ...project,
-    // readme,
-  };
-
-  return <ProjectDetail project={fullProject} />;
+  return <EnhancedProjectDetail project={project} />;
 }

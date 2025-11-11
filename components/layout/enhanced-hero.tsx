@@ -104,11 +104,9 @@ export default function EnhancedHero() {
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
               <span className="text-gray-900">Discover Open Source</span>
               <br />
-              <span className="text-blue-700">Projects That Need</span>
+              <span className="text-blue-700">Projects that Need</span>
               <br />
-              <span className="bg-gradient-to-r from-blue-600 to-gray-700 bg-clip-text text-transparent">
-                Your Help
-              </span>
+              <span className="text-navy-blue-500">Your Help</span>
             </h1>
           </motion.div>
 

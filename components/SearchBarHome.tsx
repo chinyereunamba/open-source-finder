@@ -1,47 +1,39 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button, Input } from "@/components/custom";
-import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import EnhancedSearch from "@/components/custom/enhanced-search";
 
 export default function SearchBarHome() {
   const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value);
-  };
-
-  const handleSearch = () => {
-    if (searchInput.trim()) {
-      router.push(`/projects?search=${encodeURIComponent(searchInput)}`);
+  const handleSearch = (query: string) => {
+    if (query.trim()) {
+      router.push(`/projects?search=${encodeURIComponent(query)}`);
     } else {
       router.push("/projects");
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
   };
 
   return (
     <div className="flex justify-between gap-4">
-      <div className="relative text-xl w-full">
-        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
-        <Input
-          type="search"
-          placeholder="Search projects by name, language, or topic..."
-          className="w-full pl-14 pr-4 py-5 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300 shadow-sm hover:shadow-md"
+      <div className="flex-1">
+        <EnhancedSearch
           value={searchInput}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
+          onChange={handleSearchChange}
+          onSearch={handleSearch}
+          placeholder="Search projects by name, language, or topic..."
+          className="text-lg"
         />
       </div>
       <Button
-        onClick={handleSearch}
-        className="px-8 py-5 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-2xl transition-all duration-300 whitespace-nowrap shadow-lg hover:shadow-xl"
+        onClick={() => handleSearch(searchInput)}
+        className="px-8 py-5 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-2xl transition-all duration-300 whitespace-nowrap shadow-lg hover:shadow-xl h-11"
       >
         Search
       </Button>
