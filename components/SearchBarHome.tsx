@@ -27,19 +27,24 @@ export default function SearchBarHome() {
   };
 
   return (
-    <div className="flex justify-between gap-2">
+    <div className="flex justify-between gap-4">
       <div className="relative text-xl w-full">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
         <Input
           type="search"
-          placeholder="Search projects..."
-          className="w-full pl-8 sm:w-[300px] md:w-full text-xl"
+          placeholder="Search projects by name, language, or topic..."
+          className="w-full pl-14 pr-4 py-5 text-lg border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300 shadow-sm hover:shadow-md"
           value={searchInput}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
         />
       </div>
-      <Button onClick={handleSearch}>Search</Button>
+      <Button
+        onClick={handleSearch}
+        className="px-8 py-5 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-2xl transition-all duration-300 whitespace-nowrap shadow-lg hover:shadow-xl"
+      >
+        Search
+      </Button>
     </div>
   );
 }

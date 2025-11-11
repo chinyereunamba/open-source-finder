@@ -32,13 +32,12 @@ export default function FeaturedProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
-
   useEffect(() => {
     const getProjects = async () => {
       try {
         const data = await fetchFeaturedProjects();
         setProjects(data);
-        console.log(data)
+        console.log(data);
       } catch (error) {
         console.error("Error fetching projects:", error);
       } finally {
@@ -183,8 +182,8 @@ export default function FeaturedProjects() {
               {project.language && (
                 <div className="flex items-center gap-1">
                   <span className="relative flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                   </span>
                   <span>{project.language}</span>
                 </div>
