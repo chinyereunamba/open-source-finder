@@ -1,4 +1,5 @@
 import { Octokit } from "@octokit/rest";
+import { cacheManager, generateCacheKey } from "./cache-utils";
 
 export interface Project {
   id: number;
@@ -55,51 +56,103 @@ export async function fetchProjects(
   language = "All",
   topics: string[] = []
 ): Promise<Project[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  let query = search
-    ? `${search} in:name,description public stars:>500+`
-    : "public stars:>500+";
-  if (language && language !== "All") {
-    query += ` language:${language}`;
-  }
-  if (topics && topics.length > 0) {
-    for (const topic of topics) {
-      query += ` topic:${topic}`;
-    }
-  }
-  const response = await octokit.search.repos({
-    q: query,
-    sort: "stars",
-    order: "desc",
-    per_page: 20,
-    page: page,
+  // Generate cache key
+  const cacheKey = generateCacheKey("projects", {
+    page,
+    search,
+    language,
+    topics,
   });
-  if (!response) {
-    throw new Error("Failed to fetch projects");
+
+  // Check cache first
+  const cached = cacheManager.get<Project[]>(cacheKey);
+  if (cached) {
+    console.log("Returning cached projects for:", {
+      page,
+      search,
+      language,
+      topics,
+    });
+    return cached;
   }
 
-  return response.data.items.map((item: any) => ({
-    id: item.id,
-    name: item.name,
-    full_name: item.full_name,
-    description: item.description,
-    language: item.language,
-    stargazers_count: item.stargazers_count,
-    forks_count: item.forks_count,
-    open_issues_count: item.open_issues_count,
-    updated_at: item.updated_at,
-    created_at: item.created_at,
-    html_url: item.html_url,
-    topics: item.topics || [],
-    contributors_url: item.contributors_url,
-    issue_comment_url: item.issue_comment_url,
-    license: item.license,
-    issues_url: item.issues_url,
-  }));
+  try {
+    // Build search query
+    let query = search
+      ? `${search} in:name,description public stars:>500`
+      : "public stars:>500";
+
+    console.log("🔧 API - Building query with params:", {
+      search,
+      language,
+      topics,
+    });
+
+    if (language && language !== "All") {
+      query += ` language:${language}`;
+    }
+    if (topics && topics.length > 0) {
+      for (const topic of topics) {
+        query += ` topic:${topic}`;
+      }
+    }
+
+    console.log("🔎 API - Final GitHub query:", query);
+
+    const response = await octokit.search.repos({
+      q: query,
+      sort: "stars",
+      order: "desc",
+      per_page: 20,
+      page: page,
+    });
+
+    console.log(
+      "✅ API - GitHub response received:",
+      response.data.items.length,
+      "items"
+    );
+
+    if (!response) {
+      throw new Error("Failed to fetch projects");
+    }
+
+    const projects = response.data.items.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      full_name: item.full_name,
+      description: item.description,
+      language: item.language,
+      stargazers_count: item.stargazers_count,
+      forks_count: item.forks_count,
+      open_issues_count: item.open_issues_count,
+      updated_at: item.updated_at,
+      created_at: item.created_at,
+      html_url: item.html_url,
+      topics: item.topics || [],
+      contributors_url: item.contributors_url,
+      issue_comment_url: item.issue_comment_url,
+      license: item.license,
+      issues_url: item.issues_url,
+    }));
+
+    // Cache the results
+    cacheManager.set(cacheKey, projects);
+
+    return projects;
+  } catch (error) {
+    console.error("❌ API - Error fetching projects:", error);
+    throw error;
+  }
 }
 
 export async function fetchProject(projectId: number): Promise<Project | null> {
+  const cacheKey = generateCacheKey("project", { projectId });
+  const cached = cacheManager.get<Project>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   await new Promise((resolve) => setTimeout(resolve, 1000));
   try {
     const response = await octokit.request(
@@ -108,7 +161,9 @@ export async function fetchProject(projectId: number): Promise<Project | null> {
         repository_id: projectId,
       }
     );
-    return response.data;
+    const project = response.data;
+    cacheManager.set(cacheKey, project);
+    return project;
   } catch (error) {
     console.error("Error fetching project issues:", error);
     return null;

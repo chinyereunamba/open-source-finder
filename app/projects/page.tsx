@@ -2,9 +2,13 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import EnhancedProjectList from "@/components/custom/enhanced-project-list";
+import InfiniteScrollProjects from "@/components/custom/infinite-scroll-projects";
 import EnhancedFilterBar from "@/components/custom/enhanced-filter-bar";
 import { FilterOptions } from "@/components/custom/advanced-filter-panel";
 import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { PageTransition } from "@/components/ui/page-transition";
+import { ProjectListSkeleton } from "@/components/ui/loading-states";
 
 const defaultFilters: FilterOptions = {
   languages: [],
@@ -16,6 +20,9 @@ const defaultFilters: FilterOptions = {
 };
 
 export default function ProjectsPage() {
+  const searchParams = useSearchParams();
+  const useInfiniteScroll = searchParams.get("infinite") === "true";
+
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [filters, setFilters] = useState<FilterOptions>(defaultFilters);
@@ -38,38 +45,50 @@ export default function ProjectsPage() {
   const selectedTopics = filters.topics;
 
   return (
-    <div className="container px-4 py-8 md:px-6 mx-auto">
-      <div className="flex flex-col space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-            <p className="text-muted-foreground">
-              Discover open source projects that need contributors
-            </p>
+    <PageTransition>
+      <div className="container px-4 py-8 md:px-6 mx-auto">
+        <div className="flex flex-col space-y-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
+              <p className="text-muted-foreground">
+                Discover open source projects that need contributors
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button asChild>
+                <Link href="/submit">Submit a Project</Link>
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button asChild>
-              <Link href="/submit">Submit a Project</Link>
-            </Button>
-          </div>
-        </div>
 
-        <EnhancedFilterBar
-          searchValue={searchInput}
-          onSearchChange={handleSearchChange}
-          onSearch={handleSearch}
-          filters={filters}
-          onFiltersChange={handleFiltersChange}
-        />
-
-        <Suspense fallback={<div>Loading projects...</div>}>
-          <EnhancedProjectList
-            search={search}
-            language={selectedLanguage}
-            topics={selectedTopics}
+          <EnhancedFilterBar
+            searchValue={searchInput}
+            onSearchChange={handleSearchChange}
+            onSearch={handleSearch}
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
           />
-        </Suspense>
+
+          <Suspense
+            fallback={<ProjectListSkeleton viewMode="list" count={9} />}
+          >
+            {useInfiniteScroll ? (
+              <InfiniteScrollProjects
+                search={search}
+                language={selectedLanguage}
+                topics={selectedTopics}
+              />
+            ) : (
+              <EnhancedProjectList
+                search={search}
+                language={selectedLanguage}
+                topics={selectedTopics}
+              />
+            )}
+          </Suspense>
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }

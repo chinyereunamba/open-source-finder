@@ -13,6 +13,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, GitFork, Clock, ArrowRight } from "lucide-react";
 import { fetchFeaturedProjects } from "@/lib/github-api";
+import { FeaturedProjectsSkeleton } from "@/components/ui/loading-states";
+import { InlineErrorState } from "@/components/ui/error-state";
+import { motion } from "framer-motion";
 
 interface Project {
   id: number;
@@ -31,37 +34,32 @@ interface Project {
 export default function FeaturedProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadProjects = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchFeaturedProjects();
+      setProjects(data);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      setError("Failed to load featured projects");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const getProjects = async () => {
-      try {
-        const data = await fetchFeaturedProjects();
-        setProjects(data);
-        console.log(data);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getProjects();
+    loadProjects();
   }, []);
 
   if (loading) {
-    return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {[...Array(6)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardHeader className="h-24 bg-muted"></CardHeader>
-            <CardContent className="h-32 mt-4 space-y-2">
-              <div className="h-4 bg-muted rounded"></div>
-              <div className="h-4 bg-muted rounded w-3/4"></div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
+    return <FeaturedProjectsSkeleton count={6} />;
+  }
+
+  if (error) {
+    return <InlineErrorState message={error} onRetry={loadProjects} />;
   }
 
   // For demo purposes, use placeholder data if API fails
@@ -153,67 +151,97 @@ export default function FeaturedProjects() {
           },
         ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 24,
+      },
+    },
+  };
+
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+    >
       {demoProjects.map((project) => (
-        <Card key={project.id} className="flex flex-col">
-          <CardHeader>
-            <CardTitle className="line-clamp-1">
-              <Link
-                href={`/projects/${project.id}`}
-                className="hover:underline"
-              >
-                {project.full_name}
-              </Link>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex-1">
-            <p className="text-muted-foreground line-clamp-2 mb-4">
-              {project.description}
-            </p>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {project.topics.slice(0, 3).map((topic) => (
-                <Badge key={topic} variant="secondary">
-                  {topic}
-                </Badge>
-              ))}
-            </div>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              {project.language && (
-                <div className="flex items-center gap-1">
-                  <span className="relative flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                  </span>
-                  <span>{project.language}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-1">
-                <Star className="h-4 w-4" />
-                <span>{formatNumber(project.stargazers_count)}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <GitFork className="h-4 w-4" />
-                <span>{formatNumber(project.forks_count)}</span>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="border-t pt-4">
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Clock className="h-4 w-4 mr-1" />
-                <span>Updated {formatDate(project.updated_at)}</span>
-              </div>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href={`/projects/${project.id}`}>
-                  View <ArrowRight className="ml-1 h-4 w-4" />
+        <motion.div key={project.id} variants={itemVariants}>
+          <Card className="flex flex-col h-full">
+            <CardHeader>
+              <CardTitle className="line-clamp-1">
+                <Link
+                  href={`/projects/${project.id}`}
+                  className="hover:underline"
+                >
+                  {project.full_name}
                 </Link>
-              </Button>
-            </div>
-          </CardFooter>
-        </Card>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1">
+              <p className="text-muted-foreground line-clamp-2 mb-4">
+                {project.description}
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {project.topics.slice(0, 3).map((topic) => (
+                  <Badge key={topic} variant="secondary">
+                    {topic}
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                {project.language && (
+                  <div className="flex items-center gap-1">
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    <span>{project.language}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1">
+                  <Star className="h-4 w-4" />
+                  <span>{formatNumber(project.stargazers_count)}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <GitFork className="h-4 w-4" />
+                  <span>{formatNumber(project.forks_count)}</span>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="border-t pt-4">
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4 mr-1" />
+                  <span>Updated {formatDate(project.updated_at)}</span>
+                </div>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href={`/projects/${project.id}`}>
+                    View <ArrowRight className="ml-1 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </CardFooter>
+          </Card>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }
 

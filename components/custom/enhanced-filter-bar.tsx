@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Filter } from "lucide-react";
 import EnhancedSearch from "./enhanced-search";
 import FilterChips, { FilterChip } from "./filter-chips";
 import AdvancedFilterPanel, { FilterOptions } from "./advanced-filter-panel";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { debounce } from "@/lib/debounce";
 
 interface EnhancedFilterBarProps {
   searchValue: string;
@@ -133,16 +134,19 @@ export default function EnhancedFilterBar({
     );
   }, [filters]);
 
+  // Debounced search handler
+  const debouncedSearch = useCallback(
+    debounce((value: string) => {
+      // Always trigger search, even with empty value to reset results
+      onSearch(value.trim());
+    }, 300),
+    [onSearch]
+  );
+
   // Handle search with debouncing
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchValue.trim()) {
-        onSearch(searchValue.trim());
-      }
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchValue, onSearch]);
+    debouncedSearch(searchValue);
+  }, [searchValue, debouncedSearch]);
 
   return (
     <div className={cn("space-y-4", className)}>

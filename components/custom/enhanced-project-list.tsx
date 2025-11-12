@@ -8,7 +8,9 @@ import ViewModeToggle from "./view-mode-toggle";
 import PaginationControls from "./pagination-buttons";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Skeleton } from "../ui/skeleton";
+import { ProjectListSkeleton } from "../ui/loading-states";
+import { InlineErrorState } from "../ui/error-state";
+import { useOptimisticBookmark } from "@/hooks/use-optimistic-bookmark";
 
 interface Project {
   id: number;
@@ -38,53 +40,46 @@ export default function EnhancedProjectList({
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
-  const [bookmarkedProjects, setBookmarkedProjects] = useState<Set<number>>(
-    new Set()
-  );
+  const {
+    bookmarkedProjects,
+    toggleBookmark,
+    isPending: isBookmarkPending,
+  } = useOptimisticBookmark();
 
   const searchParams = useSearchParams();
   const page = Number(searchParams.get("page") || "1");
 
-  useEffect(() => {
-    const getProjects = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchProjects(page, search, language, topics);
-        setProjects(data);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-        // Use demo data as fallback
-        setProjects(demoProjects);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const [error, setError] = useState<string | null>(null);
 
-    getProjects();
+  const loadProjects = async () => {
+    setLoading(true);
+    setError(null);
+    console.log("🔍 EnhancedList - Fetching with params:", {
+      page,
+      search,
+      language,
+      topics,
+    });
+    try {
+      const data = await fetchProjects(page, search, language, topics);
+      console.log("✅ EnhancedList - Received projects:", data.length);
+      setProjects(data);
+    } catch (error) {
+      console.error("❌ EnhancedList - Error fetching projects:", error);
+      setError("Failed to load projects");
+      // Use demo data as fallback
+      setProjects(demoProjects);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProjects();
   }, [page, search, language, topics]);
 
-  // Load bookmarked projects from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("bookmarkedProjects");
-    if (saved) {
-      setBookmarkedProjects(new Set(JSON.parse(saved)));
-    }
-  }, []);
-
   const handleBookmark = (projectId: number) => {
-    const newBookmarked = new Set(bookmarkedProjects);
-    if (newBookmarked.has(projectId)) {
-      newBookmarked.delete(projectId);
-      toast.success("Project removed from bookmarks");
-    } else {
-      newBookmarked.add(projectId);
-      toast.success("Project bookmarked");
-    }
-    setBookmarkedProjects(newBookmarked);
-    localStorage.setItem(
-      "bookmarkedProjects",
-      JSON.stringify(Array.from(newBookmarked))
-    );
+    toggleBookmark(projectId);
   };
 
   const handleShare = (project: Project) => {
@@ -196,28 +191,11 @@ export default function EnhancedProjectList({
   const sourceProjects = projects.length > 0 ? projects : demoProjects;
 
   if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <Skeleton className="h-8 w-32 rounded animate-pulse"></Skeleton>
-          <Skeleton className="h-8 w-24 rounded animate-pulse"></Skeleton>
-        </div>
+    return <ProjectListSkeleton viewMode={viewMode} count={9} />;
+  }
 
-        <div
-          className={
-            viewMode === "grid"
-              ? "grid gap-6 md:grid-cols-2 lg:grid-cols-3"
-              : "space-y-4"
-          }
-        >
-          {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} className="rounded-lg animate-pulse">
-              <Skeleton className="h-48 rounded-lg"></Skeleton>
-            </Skeleton>
-          ))}
-        </div>
-      </div>
-    );
+  if (error && projects.length === 0) {
+    return <InlineErrorState message={error} onRetry={loadProjects} />;
   }
 
   const containerVariants = {

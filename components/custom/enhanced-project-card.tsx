@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -254,7 +255,7 @@ export default function EnhancedProjectCard({
                 </Badge>
               ))}
               {project.topics.length > 3 && (
-                <Badge variant="secondary" className="text-xs bg-gray-100">
+                <Badge variant="secondary" className="text-xs ">
                   +{project.topics.length - 3}
                 </Badge>
               )}
@@ -397,7 +398,7 @@ export default function EnhancedProjectCard({
               </p>
 
               {/* Topics */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 line-clamp-1">
                 {project.topics.map((topic) => (
                   <Badge
                     key={topic}
@@ -407,6 +408,11 @@ export default function EnhancedProjectCard({
                     {topic}
                   </Badge>
                 ))}
+                {project.topics.length > 9 && (
+                  <Badge variant="secondary" className="text-xs ">
+                    +{project.topics.length - 9}
+                  </Badge>
+                )}
               </div>
 
               {/* Contributors */}
@@ -466,12 +472,7 @@ export default function EnhancedProjectCard({
               >
                 <Link href={`/projects/${project.id}`}>View Project</Link>
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                asChild
-                className=""
-              >
+              <Button size="sm" variant="outline" asChild className="">
                 <a
                   href={project.html_url}
                   target="_blank"
