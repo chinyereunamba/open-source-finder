@@ -235,7 +235,7 @@ export default function AdvancedFilterPanel({
         variant="outline"
         onClick={onToggle}
         className={cn(
-          "flex items-center gap-2 transition-all duration-200",
+          "flex items-center gap-2 transition-all h-11 duration-200",
           isOpen && "bg-accent"
         )}
       >

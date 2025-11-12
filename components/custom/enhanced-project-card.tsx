@@ -167,9 +167,9 @@ export default function EnhancedProjectCard({
         whileHover="hover"
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
-        className="group"
+        className="group items-stretch"
       >
-        <Card className="h-full border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300 bg-white relative overflow-hidden">
+        <Card className="h-full hover:shadow-lg transition-all duration-300 relative overflow-hidden">
           {/* Quick Actions Overlay */}
           <motion.div
             variants={quickActionsVariants}
@@ -179,12 +179,12 @@ export default function EnhancedProjectCard({
               <Button
                 size="sm"
                 variant="secondary"
-                className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
+                className="h-8 w-8 p-0 shadow-sm"
                 onClick={handleBookmark}
               >
                 <Bookmark
                   className={`h-4 w-4 ${
-                    bookmarked ? "fill-current text-blue-600" : "text-gray-600"
+                    bookmarked ? "fill-current text-blue-600" : "text-text"
                   }`}
                 />
               </Button>
@@ -193,29 +193,29 @@ export default function EnhancedProjectCard({
               <Button
                 size="sm"
                 variant="secondary"
-                className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
+                className="h-8 w-8 p-0 shadow-sm"
                 onClick={handleShare}
               >
-                <Share2 className="h-4 w-4 text-gray-600" />
+                <Share2 className="h-4 w-4" />
               </Button>
             </motion.div>
             <motion.div variants={actionButtonVariants}>
               <Button
                 size="sm"
                 variant="secondary"
-                className="h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm"
+                className="h-8 w-8 p-0 shadow-sm"
                 onClick={handleQuickView}
               >
-                <Eye className="h-4 w-4 text-gray-600" />
+                <Eye className="h-4 w-4" />
               </Button>
             </motion.div>
           </motion.div>
 
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-3 w-full">
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
-                <Link href={`/projects/${project.id}`} className="group">
-                  <CardTitle className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2">
+                <Link href={`/projects/${project.id}`} className="group -">
+                  <CardTitle className="text-lg font-semibold w-full group-hover:text-blue-600 transition-colors duration-200 line-clamp-1">
                     {project.full_name}
                   </CardTitle>
                 </Link>
@@ -228,7 +228,7 @@ export default function EnhancedProjectCard({
                         languageColors[project.language] || "bg-gray-400"
                       }`}
                     />
-                    <span className="text-sm text-gray-600 font-medium">
+                    <span className="text-sm font-medium">
                       {project.language}
                     </span>
                   </div>
@@ -238,7 +238,7 @@ export default function EnhancedProjectCard({
           </CardHeader>
 
           <CardContent className="pt-0">
-            <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+            <p className="text-sm mb-4 line-clamp-3">
               {truncateDescription(project.description)}
             </p>
 
@@ -248,23 +248,20 @@ export default function EnhancedProjectCard({
                 <Badge
                   key={topic}
                   variant="secondary"
-                  className="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                  className="text-xs transition-colors"
                 >
                   {topic}
                 </Badge>
               ))}
               {project.topics.length > 3 && (
-                <Badge
-                  variant="secondary"
-                  className="text-xs bg-gray-100 text-gray-500"
-                >
+                <Badge variant="secondary" className="text-xs bg-gray-100">
                   +{project.topics.length - 3}
                 </Badge>
               )}
             </div>
 
             {/* Stats */}
-            <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+            <div className="flex items-center justify-between text-sm mb-4">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4" />
@@ -286,10 +283,7 @@ export default function EnhancedProjectCard({
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
                   {mockContributors.slice(0, 3).map((contributor) => (
-                    <Avatar
-                      key={contributor.id}
-                      className="h-6 w-6 border-2 border-white"
-                    >
+                    <Avatar key={contributor.id} className="h-6 w-6 border-2">
                       <AvatarImage
                         src={contributor.avatar}
                         alt={contributor.login}
@@ -300,13 +294,13 @@ export default function EnhancedProjectCard({
                     </Avatar>
                   ))}
                 </div>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs">
                   <Users className="h-3 w-3 inline mr-1" />
                   {formatNumber(project.forks_count)} contributors
                 </span>
               </div>
 
-              <div className="flex items-center text-xs text-gray-500">
+              <div className="flex items-center text-xs">
                 <Clock className="h-3 w-3 mr-1" />
                 <span>{formatDate(project.updated_at)}</span>
               </div>
@@ -327,14 +321,14 @@ export default function EnhancedProjectCard({
       onHoverEnd={() => setIsHovered(false)}
       className="group"
     >
-      <Card className="border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300 bg-white">
+      <Card className="hover:shadow-lg transition-all duration-300">
         <div className="flex flex-col md:flex-row">
           <div className="flex-1 p-6">
             <div className="flex flex-col space-y-3">
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                   <Link href={`/projects/${project.id}`} className="group">
-                    <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
+                    <h3 className="text-xl font-semibold group-hover:text-blue-600 transition-colors duration-200">
                       {project.full_name}
                     </h3>
                   </Link>
@@ -347,7 +341,7 @@ export default function EnhancedProjectCard({
                           languageColors[project.language] || "bg-gray-400"
                         }`}
                       />
-                      <span className="text-sm text-gray-600 font-medium">
+                      <span className="text-sm font-medium">
                         {project.language}
                       </span>
                     </div>
@@ -363,14 +357,14 @@ export default function EnhancedProjectCard({
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="h-8 w-8 p-0 hover:bg-gray-100"
+                      className="h-8 w-8 p-0"
                       onClick={handleBookmark}
                     >
                       <Bookmark
                         className={`h-4 w-4 ${
                           bookmarked
                             ? "fill-current text-blue-600"
-                            : "text-gray-500"
+                            : "text-text"
                         }`}
                       />
                     </Button>
@@ -379,26 +373,26 @@ export default function EnhancedProjectCard({
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="h-8 w-8 p-0 hover:bg-gray-100"
+                      className="h-8 w-8 p-0"
                       onClick={handleShare}
                     >
-                      <Share2 className="h-4 w-4 text-gray-500" />
+                      <Share2 className="h-4 w-4" />
                     </Button>
                   </motion.div>
                   <motion.div variants={actionButtonVariants}>
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="h-8 w-8 p-0 hover:bg-gray-100"
+                      className="h-8 w-8 p-0"
                       onClick={handleQuickView}
                     >
-                      <Eye className="h-4 w-4 text-gray-500" />
+                      <Eye className="h-4 w-4" />
                     </Button>
                   </motion.div>
                 </motion.div>
               </div>
 
-              <p className="text-gray-600 leading-relaxed">
+              <p className="leading-relaxed">
                 {truncateDescription(project.description)}
               </p>
 
@@ -408,7 +402,7 @@ export default function EnhancedProjectCard({
                   <Badge
                     key={topic}
                     variant="secondary"
-                    className="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                    className="text-xs transition-colors"
                   >
                     {topic}
                   </Badge>
@@ -419,10 +413,7 @@ export default function EnhancedProjectCard({
               <div className="flex items-center gap-3">
                 <div className="flex -space-x-2">
                   {mockContributors.slice(0, 4).map((contributor) => (
-                    <Avatar
-                      key={contributor.id}
-                      className="h-7 w-7 border-2 border-white"
-                    >
+                    <Avatar key={contributor.id} className="h-7 w-7 border-2">
                       <AvatarImage
                         src={contributor.avatar}
                         alt={contributor.login}
@@ -433,7 +424,7 @@ export default function EnhancedProjectCard({
                     </Avatar>
                   ))}
                 </div>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm">
                   <Users className="h-4 w-4 inline mr-1" />
                   {formatNumber(project.forks_count)} contributors
                 </span>
@@ -441,11 +432,11 @@ export default function EnhancedProjectCard({
             </div>
           </div>
 
-          <div className="flex flex-row md:flex-col justify-between items-start p-6 border-t md:border-l md:border-t-0 md:max-w-[300px] w-full bg-gray-50/50">
+          <div className="flex flex-row md:flex-col justify-between items-start p-6 border-t md:border-l md:border-t-0 md:max-w-[300px] w-full">
             <div className="flex flex-col space-y-4">
               {/* Stats */}
               <div className="flex flex-col space-y-3">
-                <div className="flex items-center gap-4 text-sm text-gray-600">
+                <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-1">
                     <Star className="h-4 w-4" />
                     <span>{formatNumber(project.stargazers_count)}</span>
@@ -460,14 +451,14 @@ export default function EnhancedProjectCard({
                   </div>
                 </div>
 
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm">
                   <Clock className="h-4 w-4 mr-1" />
                   <span>Updated {formatDate(project.updated_at)}</span>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 mt-4 md:mt-0">
+            <div className="flex max-md:flex-col gap-2 mt-4 md:mt-0">
               <Button
                 size="sm"
                 asChild
@@ -479,7 +470,7 @@ export default function EnhancedProjectCard({
                 size="sm"
                 variant="outline"
                 asChild
-                className="border-gray-300 hover:bg-gray-50"
+                className=""
               >
                 <a
                   href={project.html_url}

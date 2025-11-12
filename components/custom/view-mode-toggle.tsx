@@ -13,14 +13,14 @@ export default function ViewModeToggle({
   onViewModeChange,
 }: ViewModeToggleProps) {
   return (
-    <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-1 bg-white">
+    <div className="flex items-center gap-1 border border-border rounded-lg p-1 bg-card">
       <Button
         size="sm"
         variant={viewMode === "list" ? "default" : "ghost"}
         className={`h-8 px-3 ${
           viewMode === "list"
-            ? "bg-gray-900 text-white hover:bg-gray-800"
-            : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            ? "bg-secondary text-text hover:bg-secondary"
+            : "text-text hover:text-text hover:bg-secondary"
         }`}
         onClick={() => onViewModeChange("list")}
       >
@@ -31,8 +31,8 @@ export default function ViewModeToggle({
         variant={viewMode === "grid" ? "default" : "ghost"}
         className={`h-8 px-3 ${
           viewMode === "grid"
-            ? "bg-gray-900 text-white hover:bg-gray-800"
-            : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            ? "bg-secondary text-text hover:bg-secondary"
+            : "text-text hover:text-text hover:bg-secondary"
         }`}
         onClick={() => onViewModeChange("grid")}
       >

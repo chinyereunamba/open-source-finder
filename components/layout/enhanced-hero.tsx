@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Code, Users, Star, GitBranch, Heart } from "lucide-react";
 import Link from "next/link";
 
-const typingTexts = [
+export const typingTexts = [
   "Build amazing software together",
   "Learn from experienced developers",
   "Make an impact on millions of users",

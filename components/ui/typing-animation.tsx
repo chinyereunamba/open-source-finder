@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { typingTexts } from "../layout/enhanced-hero";
 
 interface TypingAnimationProps {
   text: string;
@@ -15,13 +16,15 @@ export default function TypingAnimation({
 }: TypingAnimationProps) {
   const [displayText, setDisplayText] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTyping, setIsTyping] = useState(true);
+
 
   useEffect(() => {
     if (currentIndex < text.length) {
       const timeout = setTimeout(() => {
         setDisplayText((prev) => prev + text[currentIndex]);
         setCurrentIndex((prev) => prev + 1);
-      }, speed);
+      }, 100);
 
       return () => clearTimeout(timeout);
     }

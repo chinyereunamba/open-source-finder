@@ -21,7 +21,7 @@ export default function SearchBarHome() {
   };
 
   return (
-    <div className="flex justify-between gap-4">
+    <div className="flex justify-between gap-2">
       <div className="flex-1">
         <EnhancedSearch
           value={searchInput}
@@ -33,7 +33,8 @@ export default function SearchBarHome() {
       </div>
       <Button
         onClick={() => handleSearch(searchInput)}
-        className="px-8 py-5 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-2xl transition-all duration-300 whitespace-nowrap shadow-lg hover:shadow-xl h-11"
+        size="lg"
+        className="h-11"
       >
         Search
       </Button>

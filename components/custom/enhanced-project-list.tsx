@@ -8,6 +8,7 @@ import ViewModeToggle from "./view-mode-toggle";
 import PaginationControls from "./pagination-buttons";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { Skeleton } from "../ui/skeleton";
 
 interface Project {
   id: number;
@@ -198,8 +199,8 @@ export default function EnhancedProjectList({
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
-          <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+          <Skeleton className="h-8 w-32 rounded animate-pulse"></Skeleton>
+          <Skeleton className="h-8 w-24 rounded animate-pulse"></Skeleton>
         </div>
 
         <div
@@ -210,9 +211,9 @@ export default function EnhancedProjectList({
           }
         >
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-gray-100 rounded-lg animate-pulse">
-              <div className="h-48 bg-gray-200 rounded-lg"></div>
-            </div>
+            <Skeleton key={i} className="rounded-lg animate-pulse">
+              <Skeleton className="h-48 rounded-lg"></Skeleton>
+            </Skeleton>
           ))}
         </div>
       </div>
@@ -246,7 +247,7 @@ export default function EnhancedProjectList({
     <div className="space-y-6">
       {/* Header with view mode toggle */}
       <div className="flex justify-between items-center">
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-muted-foreground">
           {sourceProjects.length} projects found
         </div>
         <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />

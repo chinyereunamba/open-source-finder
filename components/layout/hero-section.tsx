@@ -6,10 +6,10 @@ import SearchBarHome from "@/components/SearchBarHome";
 
 export default function HeroSection() {
   return (
-    <section className="relative w-full py-20 md:py-32 lg:py-40 bg-gradient-to-br from-white via-olivine-900 to-white overflow-hidden">
+    <section className="relative w-full py-20 md:py-32 lg:py-40 overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-50">
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-green-50 to-transparent"></div>
+        <div className="absolute inset-0"></div>
       </div>
 
       <div className="container px-4 md:px-6 mx-auto relative z-10">
@@ -26,13 +26,13 @@ export default function HeroSection() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <TypingAnimation
+              {/* <TypingAnimation
                 text="Discover Open Source Projects"
                 speed={80}
                 className="block"
-              />
+              /> */}
               <span className="block text-olivine-500 mt-2">
-                That Need Your Help
+                Find your next open-source project — fast.
               </span>
             </motion.h1>
 
@@ -48,17 +48,8 @@ export default function HeroSection() {
             </motion.p>
           </motion.div>
 
-          <motion.div
-            className="w-full max-w-2xl"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.2 }}
-          >
-            <SearchBarHome />
-          </motion.div>
-
           {/* Stats section */}
-          <motion.div
+          {/* <motion.div
             className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 w-full max-w-4xl"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -76,7 +67,7 @@ export default function HeroSection() {
               <div className="text-3xl font-bold text-navy-blue-500">100K+</div>
               <div className="text-federal-blue-300 mt-1">Issues Resolved</div>
             </div>
-          </motion.div>
+          </motion.div> */}
         </div>
       </div>
     </section>

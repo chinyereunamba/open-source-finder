@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import { Search, Flag, Users, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Card } from "../custom";
 
 const steps = [
   {
@@ -81,21 +82,29 @@ const getColorClasses = (color: string) => {
 
 export default function EnhancedHowItWorks() {
   const [activeStep, setActiveStep] = useState(0);
+  useEffect(() => {
+    setInterval(() => {
+      if (activeStep < 4) {
+        setActiveStep((prev) => prev + 1);
+      }
+      if (activeStep > 4) {
+        setActiveStep(0);
+      }
+    }, 10000);
+  }, [activeStep]);
 
   return (
-    <section className="py-24 bg-gradient-to-b from-white to-gray-100">
+    <section className="py-24">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-20"
+          className="mb-20"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            How It Works
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">How It Works</h2>
+          <p className="text-xl  max-w-3xl leading-relaxed">
             Getting started with open source contributions is easier than you
             think. Follow these simple steps to begin your journey.
           </p>
@@ -103,85 +112,55 @@ export default function EnhancedHowItWorks() {
 
         {/* Desktop Timeline View */}
         <div className="hidden lg:block">
-          <div className="relative max-w-5xl mx-auto">
+          <div className="relative">
             {/* Timeline Line */}
-            <div className="absolute top-1/2 left-0 right-0 h-2 bg-gray-200 transform -translate-y-1/2 rounded-full"></div>
-            <motion.div
-              className="absolute top-1/2 left-0 h-2 bg-gradient-to-r from-blue-600 to-slate-600 transform -translate-y-1/2 transition-all duration-1000 rounded-full"
-              initial={{ width: "0%" }}
-              whileInView={{ width: "100%" }}
-              transition={{ duration: 2, delay: 0.5 }}
-              viewport={{ once: true }}
-            ></motion.div>
 
-            <div className="relative flex justify-between items-center">
+            <div className="flex justify-between items-start gap-6">
               {steps.map((step, index) => {
                 const colorClasses = getColorClasses(step.color);
                 const Icon = step.icon;
 
                 return (
-                  <motion.div
+                  <Card
                     key={index}
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.2 }}
-                    viewport={{ once: true }}
-                    className="flex flex-col items-center cursor-pointer group"
+                    className={`px-6 bg-transparent flex flex-col border-2 group min-h-[405px] hover:border-primary transition-all duration-300 w-full ${
+                      activeStep == index
+                        ? "border-primary"
+                        : "border-transparent"
+                    }`}
                     onMouseEnter={() => setActiveStep(index)}
                   >
                     {/* Step Circle */}
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      className={`w-24 h-24 ${colorClasses.iconBg} ${colorClasses.iconText} rounded-full flex items-center justify-center mb-8 shadow-lg group-hover:shadow-xl transition-shadow duration-300 relative z-10 border-4 border-white`}
-                    >
+                    <div className="grid place-items-center">
                       <Icon className="h-12 w-12" />
-                    </motion.div>
+                    </div>
 
                     {/* Step Content */}
-                    <div className="text-center max-w-xs">
-                      <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    <div className="">
+                      <h3 className="text-xl font-bold text-center mb-4">
                         {step.title}
                       </h3>
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                      <p className=" text-sm leading-relaxed text-muted-foreground">
                         {step.description}
                       </p>
                     </div>
-
-                    {/* Arrow (except for last step) */}
-                    {index < steps.length - 1 && (
-                      <motion.div
-                        animate={{ x: [0, 10, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="absolute top-12 -right-8 text-gray-400"
-                      >
-                        <ArrowRight className="h-6 w-6" />
-                      </motion.div>
-                    )}
-                  </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={` ${
+                        activeStep == index ? "block" : "hidden"
+                      } `}
+                    >
+                      <p className="text-lg leading-relaxed">{step.details}</p>
+                    </motion.div>
+                  </Card>
                 );
               })}
             </div>
           </div>
 
           {/* Active Step Details */}
-          <motion.div
-            key={activeStep}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className={`mt-20 p-8 rounded-3xl ${
-              getColorClasses(steps[activeStep].color).activeBg
-            } border-2 ${
-              getColorClasses(steps[activeStep].color).border
-            } max-w-4xl mx-auto`}
-          >
-            <h4 className="text-2xl font-bold text-gray-900 mb-4">
-              Step {activeStep + 1}: {steps[activeStep].title}
-            </h4>
-            <p className="text-gray-700 text-lg leading-relaxed">
-              {steps[activeStep].details}
-            </p>
-          </motion.div>
         </div>
 
         {/* Mobile Card View */}
@@ -197,12 +176,10 @@ export default function EnhancedHowItWorks() {
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
                 viewport={{ once: true }}
-                className={`bg-white p-8 rounded-3xl shadow-lg border-2 ${colorClasses.border}`}
+                className={` p-8 rounded-3xl shadow-lg border-2 ${colorClasses.border}`}
               >
                 <div className="flex items-start space-x-6">
-                  <div
-                    className={`w-16 h-16 ${colorClasses.iconBg} ${colorClasses.iconText} rounded-2xl flex items-center justify-center flex-shrink-0`}
-                  >
+                  <div className={``}>
                     <Icon className="h-8 w-8" />
                   </div>
                   <div className="flex-1">
@@ -213,11 +190,9 @@ export default function EnhancedHowItWorks() {
                         Step {index + 1}
                       </span>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">
-                      {step.title}
-                    </h3>
-                    <p className="text-gray-600 mb-4">{step.description}</p>
-                    <p className="text-gray-500 text-sm">{step.details}</p>
+                    <h3 className="text-xl font-bold  mb-3">{step.title}</h3>
+                    <p className=" mb-4">{step.description}</p>
+                    <p className=" text-sm">{step.details}</p>
                   </div>
                 </div>
               </motion.div>

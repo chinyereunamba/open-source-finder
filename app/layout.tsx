@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type React from "react";
-import "@/app/globals.css";
+import "./globals.css";
 import { Inter } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import Footer from "@/components/layout/footer";
@@ -8,7 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import Header from "../components/layout/header";
 import { getServerSession } from "next-auth";
-const inter = Inter({ subsets: ["latin"] });
+export const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Open Source Finder",
@@ -19,8 +19,8 @@ export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
-  }) {
-  const session = await getServerSession()
+}) {
+  const session = await getServerSession();
   return (
     <SessionProviderWrapper session={session}>
       <html lang="en" suppressHydrationWarning>
