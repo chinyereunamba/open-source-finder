@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Search, Flag, Users, ArrowRight } from "lucide-react";
+import { Search, Flag, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Card } from "../custom";
 
@@ -82,16 +82,14 @@ const getColorClasses = (color: string) => {
 
 export default function EnhancedHowItWorks() {
   const [activeStep, setActiveStep] = useState(0);
+
   useEffect(() => {
-    setInterval(() => {
-      if (activeStep < 4) {
-        setActiveStep((prev) => prev + 1);
-      }
-      if (activeStep > 4) {
-        setActiveStep(0);
-      }
-    }, 10000);
-  }, [activeStep]);
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % steps.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section className="py-24">
@@ -115,46 +113,63 @@ export default function EnhancedHowItWorks() {
           <div className="relative">
             {/* Timeline Line */}
 
-            <div className="flex justify-between items-start gap-6">
+            <div className="grid grid-cols-3 gap-6">
               {steps.map((step, index) => {
-                const colorClasses = getColorClasses(step.color);
                 const Icon = step.icon;
 
                 return (
-                  <Card
+                  <motion.div
                     key={index}
-                    className={`px-6 bg-transparent flex flex-col border-2 group min-h-[405px] hover:border-primary transition-all duration-300 w-full ${
-                      activeStep == index
-                        ? "border-primary"
-                        : "border-transparent"
-                    }`}
-                    onMouseEnter={() => setActiveStep(index)}
+                    animate={{
+                      scale: activeStep === index ? 1.02 : 1,
+                    }}
+                    transition={{
+                      duration: 0.4,
+                      ease: "easeInOut",
+                    }}
+                    className="h-full"
                   >
-                    {/* Step Circle */}
-                    <div className="grid place-items-center">
-                      <Icon className="h-12 w-12" />
-                    </div>
-
-                    {/* Step Content */}
-                    <div className="">
-                      <h3 className="text-xl font-bold text-center mb-4">
-                        {step.title}
-                      </h3>
-                      <p className=" text-sm leading-relaxed text-muted-foreground">
-                        {step.description}
-                      </p>
-                    </div>
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className={` ${
-                        activeStep == index ? "block" : "hidden"
-                      } `}
+                    <Card
+                      className={`px-6 py-8 bg-transparent flex flex-col border-2 group h-[430px] hover:border-primary transition-all duration-500 ${
+                        activeStep === index
+                          ? "border-primary shadow-lg"
+                          : "border-transparent"
+                      }`}
+                      onMouseEnter={() => setActiveStep(index)}
                     >
-                      <p className="text-lg leading-relaxed">{step.details}</p>
-                    </motion.div>
-                  </Card>
+                      {/* Step Circle */}
+                      <div className="grid place-items-center mb-6">
+                        <Icon className="h-12 w-12" />
+                      </div>
+
+                      {/* Step Content */}
+                      <div className="flex-1 flex flex-col">
+                        <h3 className="text-xl font-bold text-center mb-4">
+                          {step.title}
+                        </h3>
+                        <p className="text-sm leading-relaxed text-muted-foreground mb-4">
+                          {step.description}
+                        </p>
+                        <motion.div
+                          initial={false}
+                          animate={{
+                            opacity: activeStep === index ? 1 : 0,
+                            height: activeStep === index ? "auto" : 0,
+                            y: activeStep === index ? 0 : 20,
+                          }}
+                          transition={{
+                            duration: 0.5,
+                            ease: "easeInOut",
+                          }}
+                          className="overflow-hidden mt-auto"
+                        >
+                          <p className="text-sm leading-relaxed pt-4 border-t">
+                            {step.details}
+                          </p>
+                        </motion.div>
+                      </div>
+                    </Card>
+                  </motion.div>
                 );
               })}
             </div>

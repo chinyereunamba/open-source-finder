@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { UserInterestTracker } from "@/lib/user-interests";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -49,12 +51,39 @@ interface EnhancedProjectDetailProps {
 export default function EnhancedProjectDetail({
   project,
 }: EnhancedProjectDetailProps) {
+  const { data: session } = useSession();
+  const userId = session?.user?.email || "";
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
+  // Track project view on mount
+  useEffect(() => {
+    if (userId && project.id) {
+      UserInterestTracker.trackProjectView(userId, project.id);
+    }
+  }, [userId, project.id]);
+
+  // Check if project is bookmarked
+  useEffect(() => {
+    if (userId) {
+      const preferences = UserInterestTracker.getUserPreferences(userId);
+      setIsBookmarked(preferences.bookmarkedProjects.includes(project.id));
+    }
+  }, [userId, project.id]);
+
   const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
-    // TODO: Implement actual bookmark functionality
+    if (!userId) {
+      // TODO: Show sign-in prompt
+      return;
+    }
+
+    const newBookmarkState = !isBookmarked;
+    setIsBookmarked(newBookmarkState);
+    UserInterestTracker.trackProjectBookmark(
+      userId,
+      project.id,
+      newBookmarkState
+    );
   };
 
   const handleShare = () => {

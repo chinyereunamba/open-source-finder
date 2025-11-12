@@ -1,57 +1,34 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, GitFork, ArrowRight } from "lucide-react";
-
-interface Project {
-  id: number;
-  name: string;
-  description: string;
-  language: string;
-  stars: number;
-  forks: number;
-  tags: string[];
-  reason: string;
-}
+import {
+  Star,
+  GitFork,
+  ArrowRight,
+  ThumbsUp,
+  ThumbsDown,
+  X,
+  Lightbulb,
+  RefreshCw,
+} from "lucide-react";
+import { useRecommendations } from "@/hooks/use-recommendations";
+import { RecommendationReason } from "@/lib/recommendation-engine";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function RecommendedProjects() {
-  const [projects] = useState<Project[]>([
-    {
-      id: 5,
-      name: "rust-lang/rust",
-      description:
-        "Empowering everyone to build reliable and efficient software.",
-      language: "Rust",
-      stars: 79000,
-      forks: 10000,
-      tags: ["systems-programming", "language", "good-first-issue"],
-      reason: "Based on your interest in systems programming",
-    },
-    {
-      id: 6,
-      name: "kubernetes/kubernetes",
-      description: "Production-Grade Container Scheduling and Management",
-      language: "Go",
-      stars: 97000,
-      forks: 35000,
-      tags: ["container", "orchestration", "cloud", "help-wanted"],
-      reason: "Matches your cloud infrastructure skills",
-    },
-    {
-      id: 7,
-      name: "django/django",
-      description: "The Web framework for perfectionists with deadlines.",
-      language: "Python",
-      stars: 65000,
-      forks: 27000,
-      tags: ["web-framework", "python", "good-first-issue"],
-      reason: "You might enjoy this based on your web development experience",
-    },
-  ]);
+  const {
+    recommendations,
+    loading,
+    error,
+    provideFeedback,
+    refreshRecommendations,
+  } = useRecommendations({ limit: 6 });
+
+  const [feedbackLoading, setFeedbackLoading] = useState<number | null>(null);
 
   const formatNumber = (num: number): string => {
     if (num >= 1000) {
@@ -60,66 +37,240 @@ export default function RecommendedProjects() {
     return num.toString();
   };
 
+  const getReasonIcon = (type: RecommendationReason["type"]) => {
+    switch (type) {
+      case "language_match":
+        return "💻";
+      case "topic_interest":
+        return "🎯";
+      case "difficulty_level":
+        return "📊";
+      case "community_activity":
+        return "👥";
+      case "similar_projects":
+        return "🔗";
+      case "trending":
+        return "🔥";
+      default:
+        return "✨";
+    }
+  };
+
+  const handleFeedback = async (
+    projectId: number,
+    feedbackType: "interested" | "not_interested" | "dismissed"
+  ) => {
+    const project = recommendations.find((p) => p.id === projectId);
+    if (!project) return;
+
+    setFeedbackLoading(projectId);
+    try {
+      await provideFeedback(projectId, feedbackType, project);
+
+      if (feedbackType === "interested") {
+        toast.success("Great! We'll show you more projects like this.");
+      } else if (feedbackType === "not_interested") {
+        toast.info(
+          "Thanks for the feedback. We'll adjust your recommendations."
+        );
+      }
+    } catch (err) {
+      toast.error("Failed to record feedback");
+    } finally {
+      setFeedbackLoading(null);
+    }
+  };
+
+  const handleRefresh = async () => {
+    try {
+      await refreshRecommendations();
+      toast.success("Recommendations refreshed!");
+    } catch (err) {
+      toast.error("Failed to refresh recommendations");
+    }
+  };
+
+  if (loading && recommendations.length === 0) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <Card key={i}>
+            <CardContent className="p-4">
+              <div className="animate-pulse space-y-3">
+                <div className="h-4 bg-muted rounded w-3/4"></div>
+                <div className="h-3 bg-muted rounded w-full"></div>
+                <div className="h-3 bg-muted rounded w-5/6"></div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground mb-4">{error}</p>
+        <Button onClick={handleRefresh} variant="outline" size="sm">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Try Again
+        </Button>
+      </div>
+    );
+  }
+
+  if (recommendations.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <Lightbulb className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+        <p className="text-muted-foreground mb-4">
+          No recommendations yet. Start exploring projects to get personalized
+          suggestions!
+        </p>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/projects">Browse Projects</Link>
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      {projects.map((project) => (
-        <Card key={project.id}>
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
+      <div className="flex justify-end mb-2">
+        <Button
+          onClick={handleRefresh}
+          variant="ghost"
+          size="sm"
+          disabled={loading}
+          className="gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          Refresh
+        </Button>
+      </div>
+
+      {recommendations.map((project) => {
+        const topReason = project.reasons[0];
+        const isFeedbackLoading = feedbackLoading === project.id;
+
+        return (
+          <Card
+            key={project.id}
+            className="group hover:shadow-md transition-shadow"
+          >
+            <CardContent className="p-4">
+              <div className="flex flex-col gap-3">
+                {/* Header */}
+                <div className="flex items-start justify-between gap-2">
                   <Link
                     href={`/projects/${project.id}`}
-                    className="font-medium hover:underline"
+                    className="font-medium hover:underline flex-1"
                   >
-                    {project.name}
+                    {project.full_name || project.name}
                   </Link>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
                     <div className="flex items-center gap-1">
                       <Star className="h-4 w-4" />
-                      <span>{formatNumber(project.stars)}</span>
+                      <span>{formatNumber(project.stargazers_count)}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <GitFork className="h-4 w-4" />
-                      <span>{formatNumber(project.forks)}</span>
+                      <span>{formatNumber(project.forks_count)}</span>
                     </div>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {project.description}
+
+                {/* Description */}
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {project.description || "No description available"}
                 </p>
-                <div className="flex items-center gap-2 mt-2">
-                  <div className="flex items-center gap-1">
-                    <span className="relative flex h-3 w-3">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-                    </span>
-                    <span className="text-sm">{project.language}</span>
-                  </div>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {project.tags.slice(0, 2).map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
+
+                {/* Language and Topics */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {project.language && (
+                    <div className="flex items-center gap-1">
+                      <span className="relative flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                      </span>
+                      <span className="text-sm">{project.language}</span>
+                    </div>
+                  )}
+                  {project.topics?.slice(0, 2).map((topic) => (
+                    <Badge key={topic} variant="secondary" className="text-xs">
+                      {topic}
+                    </Badge>
+                  ))}
                 </div>
-                <p className="text-xs text-muted-foreground mt-2 italic">
-                  {project.reason}
-                </p>
+
+                {/* Recommendation Reason */}
+                {topReason && topReason.explanation && (
+                  <div className="flex items-start gap-2 p-2 bg-muted/50 rounded-md">
+                    <span className="text-base shrink-0">
+                      {getReasonIcon(topReason.type)}
+                    </span>
+                    <p className="text-xs text-muted-foreground italic">
+                      {topReason.explanation}
+                    </p>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex items-center justify-between gap-2 pt-2 border-t">
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleFeedback(project.id, "interested")}
+                      disabled={isFeedbackLoading}
+                      className="gap-1 h-8"
+                      title="I'm interested"
+                    >
+                      <ThumbsUp className="h-3 w-3" />
+                      <span className="text-xs">Interested</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        handleFeedback(project.id, "not_interested")
+                      }
+                      disabled={isFeedbackLoading}
+                      className="gap-1 h-8"
+                      title="Not interested"
+                    >
+                      <ThumbsDown className="h-3 w-3" />
+                      <span className="text-xs">Not for me</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleFeedback(project.id, "dismissed")}
+                      disabled={isFeedbackLoading}
+                      className="h-8 px-2"
+                      title="Dismiss"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    asChild
+                    className="gap-1 h-8"
+                  >
+                    <Link href={`/projects/${project.id}`}>
+                      View
+                      <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center">
-                <Button variant="ghost" size="sm" asChild className="gap-1">
-                  <Link href={`/projects/${project.id}`}>
-                    View
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }

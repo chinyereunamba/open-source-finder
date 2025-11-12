@@ -36,10 +36,98 @@ import UserContributions from "@/components/custom/user-contributions";
 import UserProjects from "@/components/custom/user-projects";
 import UserActivity from "@/components/custom/user-activity";
 import RecommendedProjects from "@/components/custom/recommended-projects";
+import { ProfileStats } from "@/components/custom/profile-stats";
+import { SkillPreferences } from "@/components/custom/skill-preferences";
+import { ActivityTimeline } from "@/components/custom/activity-timeline";
+import { SocialConnections } from "@/components/custom/social-connections";
+import { ProfileCustomization } from "@/components/custom/profile-customization";
 import { useSession } from "next-auth/react";
 
 export default function ProfilePage() {
   const { data: session } = useSession();
+
+  // Mock data for demonstration
+  const mockStats = {
+    totalContributions: 1247,
+    pullRequests: 89,
+    issuesOpened: 156,
+    commits: 892,
+    starsReceived: 234,
+    forksReceived: 45,
+    contributionStreak: 12,
+    longestStreak: 45,
+  };
+
+  const mockSkills = {
+    languages: ["TypeScript", "Python", "Go", "Rust", "JavaScript"],
+    skillLevel: "advanced" as const,
+    interests: ["Web Development", "AI/ML", "DevOps", "Open Source"],
+  };
+
+  const mockActivities = [
+    {
+      id: "1",
+      type: "pull_request" as const,
+      title: "Add new authentication feature",
+      repository: "username/awesome-project",
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+    },
+    {
+      id: "2",
+      type: "commit" as const,
+      title: "Fix bug in user profile",
+      repository: "org/main-repo",
+      timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
+    },
+    {
+      id: "3",
+      type: "star" as const,
+      title: "Starred react-query",
+      repository: "tanstack/react-query",
+      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    },
+  ];
+
+  const mockFollowers = [
+    {
+      id: "1",
+      name: "Jane Developer",
+      username: "janedev",
+      avatar: "/placeholder.svg",
+      bio: "Full-stack developer passionate about open source",
+      isFollowing: true,
+      mutualConnections: 5,
+    },
+    {
+      id: "2",
+      name: "John Coder",
+      username: "johncodes",
+      avatar: "/placeholder.svg",
+      bio: "Backend engineer | Go enthusiast",
+      isFollowing: false,
+      mutualConnections: 2,
+    },
+  ];
+
+  const mockFollowing = [
+    {
+      id: "3",
+      name: "Sarah Tech",
+      username: "sarahtech",
+      avatar: "/placeholder.svg",
+      bio: "DevOps engineer and cloud architect",
+      isFollowing: true,
+    },
+  ];
+
+  const mockCustomization = {
+    showEmail: false,
+    showLocation: true,
+    showActivity: true,
+    showStats: true,
+    profileVisibility: "public" as const,
+  };
+
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
@@ -164,21 +252,53 @@ export default function ProfilePage() {
                         {user?.bio || "No bio provided."}
                       </p>
                     </div>
+                    <Link href="/profile/edit" className="w-full mt-4">
+                      <Button variant="outline" className="w-full gap-2">
+                        <Edit className="h-4 w-4" />
+                        Edit Profile
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
             </div>
             {/* Main Content */}
-            <div className="md:w-2/3 space-y-6 flex flex-col items-center justify-center">
-              <Card className="w-full">
-                <CardHeader>
-                  <CardTitle>Welcome to your profile!</CardTitle>
-                  <CardDescription>
-                    This is your GitHub-connected profile. More features coming
-                    soon.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+            <div className="md:w-2/3 space-y-6">
+              <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="activity">Activity</TabsTrigger>
+                  <TabsTrigger value="connections">Connections</TabsTrigger>
+                  <TabsTrigger value="settings">Settings</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="overview" className="space-y-6 mt-6">
+                  <ProfileStats stats={mockStats} />
+                  <SkillPreferences skills={mockSkills} editable={true} />
+                </TabsContent>
+
+                <TabsContent value="activity" className="space-y-6 mt-6">
+                  <ActivityTimeline activities={mockActivities} />
+                </TabsContent>
+
+                <TabsContent value="connections" className="space-y-6 mt-6">
+                  <SocialConnections
+                    followers={mockFollowers}
+                    following={mockFollowing}
+                    onFollow={(id) => console.log("Follow:", id)}
+                    onUnfollow={(id) => console.log("Unfollow:", id)}
+                  />
+                </TabsContent>
+
+                <TabsContent value="settings" className="space-y-6 mt-6">
+                  <ProfileCustomization
+                    settings={mockCustomization}
+                    onSave={(settings) =>
+                      console.log("Save settings:", settings)
+                    }
+                  />
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
         </div>

@@ -1,249 +1,348 @@
 "use client";
 
-import type React from "react";
-
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { PageTransition } from "@/components/ui/page-transition";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
-  ArrowLeft,
-  Upload,
-  Github,
-  Twitter,
-  Linkedin,
-  Globe,
-  Mail,
-} from "lucide-react";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ArrowLeft, User, Save, Upload, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 
 export default function EditProfilePage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "Sarah Johnson",
-    username: "sarahjohnson",
-    avatar: "/placeholder.svg?height=200&width=200",
-    bio: "Full-stack developer passionate about open source. Contributing to React, Next.js, and TypeScript projects. Always learning and sharing knowledge with the community.",
-    location: "San Francisco, CA",
-    github: "https://github.com/sarahjohnson",
-    twitter: "https://twitter.com/sarahjohnson",
-    linkedin: "https://linkedin.com/in/sarahjohnson",
-    website: "https://sarahjohnson.dev",
-    email: "sarah@example.com",
-  });
+  const { data: session, status } = useSession();
+  const user = session?.user as any;
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const [displayName, setDisplayName] = useState(user?.name || "");
+  const [bio, setBio] = useState(user?.bio || "");
+  const [location, setLocation] = useState(user?.location || "");
+  const [website, setWebsite] = useState(user?.blog || "");
+  const [company, setCompany] = useState(user?.company || "");
+  const [skillLevel, setSkillLevel] = useState<string>("intermediate");
+  const [languages, setLanguages] = useState<string[]>([
+    "TypeScript",
+    "JavaScript",
+    "Python",
+  ]);
+  const [interests, setInterests] = useState<string[]>([
+    "Web Development",
+    "Open Source",
+  ]);
+  const [newLanguage, setNewLanguage] = useState("");
+  const [newInterest, setNewInterest] = useState("");
+
+  const addLanguage = () => {
+    if (newLanguage && !languages.includes(newLanguage)) {
+      setLanguages([...languages, newLanguage]);
+      setNewLanguage("");
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const removeLanguage = (lang: string) => {
+    setLanguages(languages.filter((l) => l !== lang));
+  };
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast("Profile updated successfully!");
-    }, 1500);
+  const addInterest = () => {
+    if (newInterest && !interests.includes(newInterest)) {
+      setInterests([...interests, newInterest]);
+      setNewInterest("");
+    }
+  };
+
+  const removeInterest = (interest: string) => {
+    setInterests(interests.filter((i) => i !== interest));
+  };
+
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-2xl font-bold mb-4">
+          You must be signed in to edit your profile.
+        </h2>
+        <Link href="/auth/sign-in">
+          <Button>Sign In</Button>
+        </Link>
+      </div>
+    );
+  }
+
+  const handleSave = () => {
+    // In a real app, this would save to a backend
+    toast.success("Profile updated successfully!");
   };
 
   return (
-    <div className="container px-4 py-8 md:px-6 max-w-3xl mx-auto">
-      <div className="flex flex-col space-y-8">
-        <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/profile">
-              <ArrowLeft className="mr-1 h-4 w-4" />
-              Back to profile
-            </Link>
-          </Button>
-        </div>
-
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Edit Profile</h1>
-          <p className="text-muted-foreground mt-2">
-            Update your profile information and social links
+    <PageTransition>
+      <div className="container px-4 py-8 md:px-6 mx-auto max-w-4xl">
+        {/* Header */}
+        <div className="mb-8">
+          <Link href="/profile">
+            <Button variant="ghost" className="mb-4 gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Profile
+            </Button>
+          </Link>
+          <div className="flex items-center gap-3 mb-4">
+            <User className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-bold">Edit Profile</h1>
+          </div>
+          <p className="text-muted-foreground">
+            Update your profile information
           </p>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
-                <CardDescription>
-                  Update your personal information and profile picture
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex flex-col sm:flex-row gap-6 items-start">
-                  <div className="flex flex-col items-center space-y-2">
-                    <Avatar className="h-24 w-24">
-                      <AvatarImage
-                        src={formData.avatar || "/placeholder.svg"}
-                        alt={formData.name}
-                      />
-                      <AvatarFallback>
-                        {formData.name.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <Button variant="outline" size="sm">
-                      <Upload className="mr-2 h-4 w-4" />
-                      Change Photo
-                    </Button>
-                  </div>
-                  <div className="flex-1 space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Full Name</Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          placeholder="Your full name"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="username">Username</Label>
-                        <Input
-                          id="username"
-                          name="username"
-                          value={formData.username}
-                          onChange={handleChange}
-                          placeholder="Your username"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="bio">Bio</Label>
-                      <Textarea
-                        id="bio"
-                        name="bio"
-                        value={formData.bio}
-                        onChange={handleChange}
-                        placeholder="Tell us about yourself"
-                        rows={4}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="location">Location</Label>
-                      <Input
-                        id="location"
-                        name="location"
-                        value={formData.location}
-                        onChange={handleChange}
-                        placeholder="City, Country"
-                      />
-                    </div>
-                  </div>
+        <div className="space-y-6">
+          {/* Profile Picture */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Profile Picture</CardTitle>
+              <CardDescription>
+                Your profile picture is synced from GitHub
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-4">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
+                  <AvatarFallback>
+                    {user?.name?.substring(0, 2).toUpperCase() || "US"}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    To change your profile picture, update it on GitHub
+                  </p>
+                  <Button variant="outline" size="sm" className="mt-2" asChild>
+                    <a
+                      href={user?.html_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Go to GitHub Profile
+                    </a>
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Social Links</CardTitle>
-                <CardDescription>
-                  Connect your social media accounts and contact information
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="github" className="flex items-center">
-                    <Github className="h-4 w-4 mr-2" />
-                    GitHub
-                  </Label>
-                  <Input
-                    id="github"
-                    name="github"
-                    value={formData.github}
-                    onChange={handleChange}
-                    placeholder="https://github.com/username"
-                  />
+          {/* Basic Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Basic Information</CardTitle>
+              <CardDescription>
+                Your basic profile information from GitHub
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="display-name">Display Name</Label>
+                <Input
+                  id="display-name"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="Your name"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bio">Bio</Label>
+                <Textarea
+                  id="bio"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  placeholder="Tell us about yourself"
+                  rows={4}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="location">Location</Label>
+                <Input
+                  id="location"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="City, Country"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="website">Website</Label>
+                <Input
+                  id="website"
+                  type="url"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  placeholder="https://yourwebsite.com"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="company">Company</Label>
+                <Input
+                  id="company"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  placeholder="Your company"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Skills & Preferences */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Skills & Preferences</CardTitle>
+              <CardDescription>
+                Set your skill level and programming preferences
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="skill-level">Skill Level</Label>
+                <Select value={skillLevel} onValueChange={setSkillLevel}>
+                  <SelectTrigger id="skill-level">
+                    <SelectValue placeholder="Select your skill level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                    <SelectItem value="expert">Expert</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Programming Languages</Label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {languages.map((lang) => (
+                    <Badge key={lang} variant="secondary" className="gap-1">
+                      {lang}
+                      <X
+                        className="h-3 w-3 cursor-pointer hover:text-destructive"
+                        onClick={() => removeLanguage(lang)}
+                      />
+                    </Badge>
+                  ))}
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="twitter" className="flex items-center">
-                    <Twitter className="h-4 w-4 mr-2" />
-                    Twitter
-                  </Label>
+                <div className="flex gap-2">
                   <Input
-                    id="twitter"
-                    name="twitter"
-                    value={formData.twitter}
-                    onChange={handleChange}
-                    placeholder="https://twitter.com/username"
+                    placeholder="Add a language"
+                    value={newLanguage}
+                    onChange={(e) => setNewLanguage(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && addLanguage()}
                   />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addLanguage}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="linkedin" className="flex items-center">
-                    <Linkedin className="h-4 w-4 mr-2" />
-                    LinkedIn
-                  </Label>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Interests</Label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {interests.map((interest) => (
+                    <Badge key={interest} variant="outline" className="gap-1">
+                      {interest}
+                      <X
+                        className="h-3 w-3 cursor-pointer hover:text-destructive"
+                        onClick={() => removeInterest(interest)}
+                      />
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex gap-2">
                   <Input
-                    id="linkedin"
-                    name="linkedin"
-                    value={formData.linkedin}
-                    onChange={handleChange}
-                    placeholder="https://linkedin.com/in/username"
+                    placeholder="Add an interest"
+                    value={newInterest}
+                    onChange={(e) => setNewInterest(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && addInterest()}
                   />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addInterest}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="website" className="flex items-center">
-                    <Globe className="h-4 w-4 mr-2" />
-                    Website
-                  </Label>
-                  <Input
-                    id="website"
-                    name="website"
-                    value={formData.website}
-                    onChange={handleChange}
-                    placeholder="https://yourwebsite.com"
-                  />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* GitHub Stats */}
+          <Card>
+            <CardHeader>
+              <CardTitle>GitHub Stats</CardTitle>
+              <CardDescription>
+                Your GitHub statistics (read-only)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-bold">
+                    {user?.public_repos || 0}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Repositories</p>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="flex items-center">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="your.email@example.com"
-                  />
+                <div>
+                  <p className="text-2xl font-bold">{user?.followers || 0}</p>
+                  <p className="text-sm text-muted-foreground">Followers</p>
                 </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" type="button" asChild>
-                  <Link href="/profile">Cancel</Link>
-                </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Saving..." : "Save Changes"}
-                </Button>
-              </CardFooter>
-            </Card>
+                <div>
+                  <p className="text-2xl font-bold">{user?.following || 0}</p>
+                  <p className="text-sm text-muted-foreground">Following</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Save Button */}
+          <div className="flex justify-end gap-4">
+            <Link href="/profile">
+              <Button variant="outline">Cancel</Button>
+            </Link>
+            <Button onClick={handleSave} className="gap-2">
+              <Save className="h-4 w-4" />
+              Save Changes
+            </Button>
           </div>
-        </form>
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }

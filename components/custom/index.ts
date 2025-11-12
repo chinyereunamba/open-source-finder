@@ -74,3 +74,6 @@ export {
   Grid3X3,
   List,
 };
+
+export { RecommendationPreferences } from "./recommendation-preferences";
+export { default as RecommendedProjects } from "./recommended-projects";

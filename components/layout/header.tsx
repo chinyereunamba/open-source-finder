@@ -13,7 +13,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Search, Github, Bell, User, Settings, LogOut } from "lucide-react";
+import {
+  Search,
+  Github,
+  Bell,
+  User,
+  Settings,
+  LogOut,
+  LayoutDashboard,
+} from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 
 export default function Header() {
@@ -41,6 +49,14 @@ export default function Header() {
             >
               Projects
             </Link>
+            {isLoggedIn && (
+              <Link
+                href="/dashboard"
+                className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
+              >
+                Dashboard
+              </Link>
+            )}
             <Link
               href="/submit"
               className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
@@ -103,13 +119,19 @@ export default function Header() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
+                    <Link href="/dashboard">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link href="/profile">
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/profile/edit">
+                    <Link href="/dashboard/settings">
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </Link>

@@ -1,12 +1,17 @@
 "use client";
 
-import { Button, ButtonProps } from "./button";
+import { Button, buttonVariants } from "./button";
 import { ButtonSpinner } from "./loading-spinner";
 import { cn } from "@/lib/utils";
+import { type VariantProps } from "class-variance-authority";
+import * as React from "react";
 
-interface LoadingButtonProps extends ButtonProps {
+interface LoadingButtonProps
+  extends React.ComponentProps<"button">,
+    VariantProps<typeof buttonVariants> {
   loading?: boolean;
   loadingText?: string;
+  asChild?: boolean;
 }
 
 export function LoadingButton({
