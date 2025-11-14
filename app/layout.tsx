@@ -9,6 +9,8 @@ import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import Header from "../components/layout/header";
 import { getServerSession } from "next-auth";
+import { AchievementNotificationProvider } from "@/components/providers/achievement-notification-provider";
+import { GlobalAchievementNotifications } from "@/components/custom/global-achievement-notifications";
 export const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -40,15 +42,18 @@ export default async function RootLayout({
           <meta name="theme-color" content="#0e0e52" />
         </head>
         <body className={inter.className}>
-          {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange> */}
-          <ServiceWorkerRegistration />
-          <Header />
-          {children}
-          <Footer />
-          <Toaster />
-          <Analytics />
-          {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange> */}
-          {/* </ThemeProvider> */}
+          <AchievementNotificationProvider>
+            {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange> */}
+            <ServiceWorkerRegistration />
+            <Header />
+            {children}
+            <Footer />
+            <Toaster />
+            <GlobalAchievementNotifications />
+            <Analytics />
+            {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange> */}
+            {/* </ThemeProvider> */}
+          </AchievementNotificationProvider>
         </body>
       </html>
     </SessionProviderWrapper>

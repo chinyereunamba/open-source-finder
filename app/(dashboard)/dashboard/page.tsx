@@ -26,9 +26,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BookmarkedProjects from "@/components/custom/bookmarked-projects";
 import ContributionStreak from "@/components/custom/contribution-streak";
 import DashboardStats from "@/components/custom/dashboard-stats";
+import { AchievementsPreview } from "@/components/custom/achievements-grid";
+import { LevelDisplay } from "@/components/custom/level-display";
+import { AchievementSystem } from "@/lib/achievement-system";
+import { useState, useEffect } from "react";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
+  const [achievements, setAchievements] = useState([]);
+  const [stats, setStats] = useState(null);
+
+  const userId = session?.user?.email || "demo-user";
+
+  useEffect(() => {
+    if (session) {
+      const userAchievements = AchievementSystem.getUserAchievements(userId);
+      const userStats = AchievementSystem.getUserStats(userId);
+      setAchievements(userAchievements);
+      setStats(userStats);
+    }
+  }, [session, userId]);
 
   if (status === "loading") {
     return (
@@ -93,6 +110,38 @@ export default function DashboardPage() {
 
         {/* Stats Overview */}
         <DashboardStats />
+
+        {/* Level and Achievements Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Level Display */}
+          <div>{stats && <LevelDisplay stats={stats} />}</div>
+
+          {/* Achievements Preview */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="h-5 w-5" />
+                  Achievements
+                </CardTitle>
+                <Link href="/dashboard/achievements">
+                  <Button variant="outline" size="sm">
+                    View All
+                  </Button>
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <AchievementsPreview
+                achievements={achievements}
+                maxDisplay={6}
+                onViewAll={() =>
+                  (window.location.href = "/dashboard/achievements")
+                }
+              />
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Contribution Streak */}
         <div className="mb-8">

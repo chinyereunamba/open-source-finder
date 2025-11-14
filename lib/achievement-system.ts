@@ -625,6 +625,17 @@ export class AchievementSystem {
     localStorage.setItem(`bookmark_count_${userId}`, count.toString());
   }
 
+  static getShareCount(userId: string): number {
+    if (typeof window === "undefined") return 0;
+    const stored = localStorage.getItem(`share_count_${userId}`);
+    return stored ? parseInt(stored, 10) : 0;
+  }
+
+  static saveShareCount(userId: string, count: number): void {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(`share_count_${userId}`, count.toString());
+  }
+
   /**
    * Get achievements by category
    */
@@ -664,6 +675,7 @@ export class AchievementSystem {
       localStorage.removeItem(`${this.STATS_KEY}_${userId}`);
       localStorage.removeItem(`view_count_${userId}`);
       localStorage.removeItem(`bookmark_count_${userId}`);
+      localStorage.removeItem(`share_count_${userId}`);
     } catch (error) {
       console.error("Error clearing achievement data:", error);
     }
