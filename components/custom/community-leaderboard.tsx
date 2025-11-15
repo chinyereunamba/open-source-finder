@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 
 interface LeaderboardEntry {
   userId: string;
@@ -55,10 +55,7 @@ export default function CommunityLeaderboard() {
       );
       if (response.ok) {
         const data = await response.json();
-        setLeaderboardData((prev) => ({
-          ...prev,
-          [type]: data,
-        }));
+        setLeaderboardData((prev) => ({ ...prev, [type]: data }));
       }
     } catch (error) {
       console.error(`Error fetching ${type} leaderboard:`, error);
@@ -84,48 +81,50 @@ export default function CommunityLeaderboard() {
     }
   };
 
-  const getRankBadgeColor = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return "bg-gradient-to-r from-yellow-400 to-yellow-600";
-      case 2:
-        return "bg-gradient-to-r from-gray-300 to-gray-500";
-      case 3:
-        return "bg-gradient-to-r from-amber-400 to-amber-600";
+  const getScoreLabel = (type: string) => {
+    switch (type) {
+      case "contributions":
+        return "Contributions";
+      case "reviews":
+        return "Reviews";
+      case "helpful":
+        return "Helpful Votes";
       default:
-        return "bg-gradient-to-r from-blue-400 to-blue-600";
+        return "Score";
     }
   };
 
-  const formatScore = (score: number) => {
-    if (score >= 1000) {
-      return `${(score / 1000).toFixed(1)}k`;
+  const getScoreValue = (entry: LeaderboardEntry, type: string) => {
+    switch (type) {
+      case "contributions":
+        return entry.contributions;
+      case "reviews":
+        return entry.reviewsCount;
+      case "helpful":
+        return entry.helpfulVotes;
+      default:
+        return entry.score;
     }
-    return score.toString();
   };
 
-  const LeaderboardList = ({
-    type,
-    data,
-  }: {
-    type: string;
-    data: LeaderboardData;
-  }) => {
-    if (!data?.entries) {
+  const LeaderboardList = ({ type }: { type: string }) => {
+    const data = leaderboardData[type];
+
+    if (!data) {
       return (
-        <div className="space-y-4">
+        <div className="animate-pulse space-y-4">
           {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
-              className="animate-pulse flex items-center gap-4 p-4 border rounded-lg"
+              className="flex items-center gap-3 p-3 border rounded-lg"
             >
-              <div className="w-8 h-8 bg-gray-200 rounded"></div>
-              <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-              <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+              <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+              <div className="flex-1">
+                <div className="h-4 bg-gray-200 rounded w-1/3 mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/4"></div>
               </div>
-              <div className="h-6 bg-gray-200 rounded w-16"></div>
+              <div className="h-4 bg-gray-200 rounded w-16"></div>
             </div>
           ))}
         </div>
@@ -133,22 +132,20 @@ export default function CommunityLeaderboard() {
     }
 
     return (
-      <div className="space-y-3">
+      <div className="space-y-2">
         {data.entries.map((entry, index) => (
           <div
             key={entry.userId}
-            className={`flex items-center gap-4 p-4 rounded-lg border transition-all hover:shadow-md ${
+            className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
               entry.rank <= 3
-                ? "bg-gradient-to-r from-blue-50 to-purple-50"
-                : "bg-card"
+                ? "bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200"
+                : "hover:bg-muted/50"
             }`}
           >
-            {/* Rank */}
             <div className="flex items-center justify-center w-8">
               {getRankIcon(entry.rank)}
             </div>
 
-            {/* Avatar */}
             <Avatar className="w-10 h-10">
               <AvatarImage src={entry.avatar} alt={entry.username} />
               <AvatarFallback>
@@ -156,10 +153,9 @@ export default function CommunityLeaderboard() {
               </AvatarFallback>
             </Avatar>
 
-            {/* User Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h4 className="font-medium truncate">{entry.username}</h4>
+                <span className="font-medium truncate">{entry.username}</span>
                 {entry.githubUsername && (
                   <Badge variant="secondary" className="text-xs">
                     @{entry.githubUsername}
@@ -171,47 +167,39 @@ export default function CommunityLeaderboard() {
                   </Badge>
                 )}
               </div>
-              <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
+              <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <GitFork className="w-3 h-3" />
-                  {entry.contributions} contributions
-                </span>
-                <span className="flex items-center gap-1">
-                  <MessageSquare className="w-3 h-3" />
-                  {entry.reviewsCount} reviews
+                  {entry.contributions}
                 </span>
                 <span className="flex items-center gap-1">
                   <Star className="w-3 h-3" />
-                  {entry.helpfulVotes} helpful
+                  {entry.reviewsCount}
+                </span>
+                <span className="flex items-center gap-1">
+                  <MessageSquare className="w-3 h-3" />
+                  {entry.helpfulVotes}
                 </span>
               </div>
             </div>
 
-            {/* Score */}
             <div className="text-right">
-              <div
-                className={`px-3 py-1 rounded-full text-white text-sm font-bold ${getRankBadgeColor(
-                  entry.rank
-                )}`}
-              >
-                {formatScore(entry.score)}
+              <div className="font-bold text-lg">
+                {getScoreValue(entry, type)}
               </div>
-              <div className="text-xs text-muted-foreground mt-1">points</div>
+              <div className="text-xs text-muted-foreground">
+                {getScoreLabel(type)}
+              </div>
             </div>
           </div>
         ))}
 
-        {/* Stats Footer */}
-        <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">
-              Total active contributors: {data.totalUsers.toLocaleString()}
-            </span>
-            {data.userRank && (
-              <span className="font-medium">Your rank: #{data.userRank}</span>
-            )}
+        {data.entries.length === 0 && (
+          <div className="text-center py-8">
+            <TrendingUp className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">No data available</p>
           </div>
-        </div>
+        )}
       </div>
     );
   };
@@ -220,7 +208,7 @@ export default function CommunityLeaderboard() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="w-5 h-5" />
+          <Trophy className="w-5 h-5" />
           Community Leaderboard
         </CardTitle>
         <p className="text-sm text-muted-foreground">
@@ -235,48 +223,36 @@ export default function CommunityLeaderboard() {
               Contributions
             </TabsTrigger>
             <TabsTrigger value="reviews" className="text-xs">
-              <MessageSquare className="w-4 h-4 mr-1" />
+              <Star className="w-4 h-4 mr-1" />
               Reviews
             </TabsTrigger>
             <TabsTrigger value="helpful" className="text-xs">
-              <Star className="w-4 h-4 mr-1" />
+              <MessageSquare className="w-4 h-4 mr-1" />
               Helpful
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="contributions" className="mt-6">
-            <div className="mb-4">
-              <h3 className="font-medium mb-2">Top Contributors</h3>
-              <p className="text-sm text-muted-foreground">
-                Ranked by total contributions to open source projects
-              </p>
-            </div>
-            <LeaderboardList
-              type="contributions"
-              data={leaderboardData.contributions}
-            />
+          <TabsContent value="contributions" className="mt-4">
+            <LeaderboardList type="contributions" />
           </TabsContent>
 
-          <TabsContent value="reviews" className="mt-6">
-            <div className="mb-4">
-              <h3 className="font-medium mb-2">Top Reviewers</h3>
-              <p className="text-sm text-muted-foreground">
-                Ranked by number of project reviews written
-              </p>
-            </div>
-            <LeaderboardList type="reviews" data={leaderboardData.reviews} />
+          <TabsContent value="reviews" className="mt-4">
+            <LeaderboardList type="reviews" />
           </TabsContent>
 
-          <TabsContent value="helpful" className="mt-6">
-            <div className="mb-4">
-              <h3 className="font-medium mb-2">Most Helpful</h3>
-              <p className="text-sm text-muted-foreground">
-                Ranked by helpful votes received on reviews and comments
-              </p>
-            </div>
-            <LeaderboardList type="helpful" data={leaderboardData.helpful} />
+          <TabsContent value="helpful" className="mt-4">
+            <LeaderboardList type="helpful" />
           </TabsContent>
         </Tabs>
+
+        {leaderboardData[activeTab] && (
+          <div className="mt-4 pt-4 border-t text-center">
+            <p className="text-sm text-muted-foreground">
+              Showing top contributors out of{" "}
+              {leaderboardData[activeTab].totalUsers} total users
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

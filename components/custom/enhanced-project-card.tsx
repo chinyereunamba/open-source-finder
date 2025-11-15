@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAchievementNotificationContext } from "@/components/providers/achievement-notification-provider";
+import SocialShare from "./social-share";
 import {
   Star,
   GitFork,
@@ -205,14 +206,18 @@ export default function EnhancedProjectCard({
               </Button>
             </motion.div>
             <motion.div variants={actionButtonVariants}>
-              <Button
-                size="sm"
-                variant="secondary"
-                className="h-8 w-8 p-0 shadow-sm"
-                onClick={handleShare}
-              >
-                <Share2 className="h-4 w-4" />
-              </Button>
+              <SocialShare
+                project={project}
+                trigger={
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="h-8 w-8 p-0 shadow-sm"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                }
+              />
             </motion.div>
             <motion.div variants={actionButtonVariants}>
               <Button
@@ -385,14 +390,18 @@ export default function EnhancedProjectCard({
                     </Button>
                   </motion.div>
                   <motion.div variants={actionButtonVariants}>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-8 w-8 p-0"
-                      onClick={handleShare}
-                    >
-                      <Share2 className="h-4 w-4" />
-                    </Button>
+                    <SocialShare
+                      project={project}
+                      trigger={
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0"
+                        >
+                          <Share2 className="h-4 w-4" />
+                        </Button>
+                      }
+                    />
                   </motion.div>
                   <motion.div variants={actionButtonVariants}>
                     <Button

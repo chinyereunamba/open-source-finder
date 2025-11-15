@@ -39,10 +39,18 @@ import {
 } from "lucide-react";
 import ProjectContributors from "../custom/contributors";
 import ProjectIssues from "../custom/issues";
+import EnhancedIssues from "../custom/enhanced-issues";
+import MentorshipMatching from "../custom/mentorship-matching";
+import ContributorOnboarding from "../custom/contributor-onboarding";
+import GoodFirstIssueHighlighter from "../custom/good-first-issue-highlighter";
 import ProjectReadme from "../custom/readme";
 import ContributionDifficulty from "../custom/contribution-difficulty";
 import GettingStarted from "./getting-started";
 import SimilarProjects from "../custom/similar-projects";
+import ProjectRating from "../custom/project-rating";
+import ProjectReviews from "../custom/project-reviews";
+import ProjectComments from "../custom/project-comments";
+import SocialShare from "../custom/social-share";
 import { Project } from "@/lib/github-api";
 
 interface EnhancedProjectDetailProps {
@@ -161,10 +169,15 @@ export default function EnhancedProjectDetail({
                 {isBookmarked ? "Bookmarked" : "Bookmark"}
               </Button>
 
-              <Button variant="outline" size="sm" onClick={handleShare}>
-                <Share2 className="h-4 w-4 mr-1" />
-                Share
-              </Button>
+              <SocialShare
+                project={project}
+                trigger={
+                  <Button variant="outline" size="sm">
+                    <Share2 className="h-4 w-4 mr-1" />
+                    Share
+                  </Button>
+                }
+              />
             </div>
           </div>
 
@@ -317,7 +330,7 @@ export default function EnhancedProjectDetail({
                 onValueChange={setActiveTab}
                 className="w-full"
               >
-                <TabsList className="grid w-full grid-cols-4 h-12">
+                <TabsList className="grid w-full grid-cols-6 h-12">
                   <TabsTrigger
                     value="overview"
                     className="flex items-center gap-2"
@@ -345,6 +358,20 @@ export default function EnhancedProjectDetail({
                   >
                     <Users className="h-4 w-4" />
                     Contributors
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="reviews"
+                    className="flex items-center gap-2"
+                  >
+                    <Star className="h-4 w-4" />
+                    Reviews
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="discussion"
+                    className="flex items-center gap-2"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Discussion
                   </TabsTrigger>
                 </TabsList>
 
@@ -480,17 +507,42 @@ export default function EnhancedProjectDetail({
                 </TabsContent>
 
                 <TabsContent value="issues" className="mt-6">
-                  <ProjectIssues id={project.id} />
+                  <div className="space-y-8">
+                    <EnhancedIssues projectId={project.id} />
+
+                    {/* Mentorship Section */}
+                    <MentorshipMatching
+                      projectId={project.id}
+                      isGoodFirstIssue={true}
+                    />
+
+                    {/* Contributor Onboarding */}
+                    <ContributorOnboarding
+                      project={project}
+                      isGoodFirstIssue={true}
+                    />
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="contributors" className="mt-6">
                   <ProjectContributors projectId={project.id} />
+                </TabsContent>
+
+                <TabsContent value="reviews" className="mt-6">
+                  <ProjectReviews projectId={project.id} />
+                </TabsContent>
+
+                <TabsContent value="discussion" className="mt-6">
+                  <ProjectComments projectId={project.id} />
                 </TabsContent>
               </Tabs>
             </div>
 
             {/* Enhanced Sidebar */}
             <div className="space-y-6">
+              {/* Community Rating */}
+              <ProjectRating projectId={project.id} />
+
               {/* Contribution Difficulty */}
               <ContributionDifficulty project={project} />
 
@@ -563,6 +615,9 @@ export default function EnhancedProjectDetail({
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Good First Issues Highlight */}
+              <GoodFirstIssueHighlighter projectId={project.id} maxIssues={2} />
 
               {/* Similar Projects */}
               <SimilarProjects />

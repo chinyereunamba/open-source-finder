@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MessageSquare, Heart, Reply, Send } from "lucide-react";
+import { Heart, MessageCircle, Reply, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -22,6 +22,7 @@ interface Comment {
   parentId?: string;
   likes: number;
   createdAt: string;
+  updatedAt: string;
   user: {
     name: string;
     avatar: string;
@@ -40,7 +41,6 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
   const { data: session } = useSession();
   const [commentsData, setCommentsData] = useState<CommentsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState("");
@@ -48,27 +48,16 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
 
   useEffect(() => {
     fetchComments();
-  }, [projectId, page]);
+  }, [projectId]);
 
   const fetchComments = async () => {
     try {
       const response = await fetch(
-        `/api/community/comments?projectId=${projectId}&page=${page}&limit=20`
+        `/api/community/comments?projectId=${projectId}`
       );
       if (response.ok) {
         const data = await response.json();
-        if (page === 1) {
-          setCommentsData(data);
-        } else {
-          setCommentsData((prev) =>
-            prev
-              ? {
-                  ...data,
-                  comments: [...prev.comments, ...data.comments],
-                }
-              : data
-          );
-        }
+        setCommentsData(data);
       }
     } catch (error) {
       console.error("Error fetching comments:", error);
@@ -109,7 +98,6 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
         } else {
           setNewComment("");
         }
-        setPage(1);
         await fetchComments();
         toast.success("Comment posted successfully!");
       } else {
@@ -130,15 +118,18 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays === 1) {
-      return "1 day ago";
-    } else if (diffDays < 30) {
+      return "yesterday";
+    } else if (diffDays < 7) {
       return `${diffDays} days ago`;
-    } else if (diffDays < 365) {
-      const months = Math.floor(diffDays / 30);
-      return `${months} month${months === 1 ? "" : "s"} ago`;
+    } else if (diffDays < 30) {
+      const weeks = Math.floor(diffDays / 7);
+      return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
     } else {
-      const years = Math.floor(diffDays / 365);
-      return `${years} year${years === 1 ? "" : "s"} ago`;
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
     }
   };
 
@@ -149,9 +140,7 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
     comment: Comment;
     isReply?: boolean;
   }) => (
-    <div
-      className={`${isReply ? "ml-12 border-l-2 border-gray-100 pl-4" : ""}`}
-    >
+    <div className={`${isReply ? "ml-8 border-l-2 border-gray-100 pl-4" : ""}`}>
       <div className="flex items-start gap-3">
         <Avatar className="w-8 h-8">
           <AvatarImage src={comment.user.avatar} alt={comment.user.name} />
@@ -159,8 +148,8 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
             {comment.user.name.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center gap-2">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
             <span className="font-medium text-sm">{comment.user.name}</span>
             {comment.user.githubUsername && (
               <Badge variant="secondary" className="text-xs">
@@ -171,9 +160,9 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
               {formatDate(comment.createdAt)}
             </span>
           </div>
-          <p className="text-sm leading-relaxed">{comment.content}</p>
+          <p className="text-sm leading-relaxed mb-2">{comment.content}</p>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
               <Heart className="w-3 h-3 mr-1" />
               {comment.likes}
             </Button>
@@ -181,7 +170,7 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 px-2 text-xs"
+                className="h-6 px-2 text-xs"
                 onClick={() =>
                   setReplyTo(replyTo === comment.id ? null : comment.id)
                 }
@@ -192,14 +181,14 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
             )}
           </div>
 
-          {/* Reply Form */}
-          {replyTo === comment.id && session && (
+          {/* Reply form */}
+          {replyTo === comment.id && (
             <div className="mt-3 space-y-2">
               <Textarea
                 placeholder="Write a reply..."
-                rows={3}
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
+                rows={2}
                 className="text-sm"
               />
               <div className="flex justify-end gap-2">
@@ -230,27 +219,27 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
       {comment.replies && comment.replies.length > 0 && (
         <div className="mt-4 space-y-4">
           {comment.replies.map((reply) => (
-            <CommentItem key={reply.id} comment={reply} isReply />
+            <CommentItem key={reply.id} comment={reply} isReply={true} />
           ))}
         </div>
       )}
     </div>
   );
 
-  if (loading && !commentsData) {
+  if (loading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Comments</CardTitle>
+          <CardTitle>Discussion</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex gap-3">
                 <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-                <div className="flex-1 space-y-2">
-                  <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full"></div>
+                <div className="flex-1">
+                  <div className="h-3 bg-gray-200 rounded w-1/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-1"></div>
                   <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                 </div>
               </div>
@@ -265,12 +254,12 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <MessageSquare className="w-5 h-5" />
-          Comments ({commentsData?.totalCount || 0})
+          <MessageCircle className="w-5 h-5" />
+          Discussion ({commentsData?.totalCount || 0})
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* New Comment Form */}
+        {/* Add comment form */}
         {session ? (
           <div className="space-y-3">
             <div className="flex gap-3">
@@ -285,10 +274,10 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
               </Avatar>
               <div className="flex-1">
                 <Textarea
-                  placeholder="Share your thoughts about this project..."
-                  rows={3}
+                  placeholder="Join the discussion..."
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
+                  rows={3}
                 />
               </div>
             </div>
@@ -298,23 +287,23 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
                 disabled={submitting || !newComment.trim()}
                 size="sm"
               >
-                <Send className="w-4 h-4 mr-2" />
+                <Send className="w-4 h-4 mr-1" />
                 {submitting ? "Posting..." : "Post Comment"}
               </Button>
             </div>
           </div>
         ) : (
-          <div className="text-center py-4 border rounded-lg">
+          <div className="text-center py-4 border rounded-lg bg-muted/50">
             <p className="text-sm text-muted-foreground">
               Sign in to join the discussion
             </p>
           </div>
         )}
 
-        {/* Comments List */}
+        {/* Comments list */}
         {commentsData?.comments.length === 0 ? (
           <div className="text-center py-8">
-            <MessageSquare className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+            <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">No comments yet</p>
             <p className="text-sm text-muted-foreground">
               Start the conversation about this project
@@ -328,12 +317,8 @@ export default function ProjectComments({ projectId }: ProjectCommentsProps) {
 
             {commentsData?.hasMore && (
               <div className="text-center">
-                <Button
-                  variant="outline"
-                  onClick={() => setPage((prev) => prev + 1)}
-                  disabled={loading}
-                >
-                  {loading ? "Loading..." : "Load More Comments"}
+                <Button variant="outline" onClick={fetchComments}>
+                  Load More Comments
                 </Button>
               </div>
             )}

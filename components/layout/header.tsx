@@ -50,6 +50,12 @@ export default function Header() {
             >
               Projects
             </Link>
+            <Link
+              href="/community"
+              className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Community
+            </Link>
             {isLoggedIn && (
               <Link
                 href="/dashboard"
@@ -135,6 +141,12 @@ export default function Header() {
                     <Link href="/dashboard/achievements">
                       <BarChart3 className="mr-2 h-4 w-4" />
                       <span>Achievements</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/projects">
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      <span>My Projects</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>

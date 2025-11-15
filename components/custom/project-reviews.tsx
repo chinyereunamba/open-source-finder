@@ -31,6 +31,7 @@ interface Review {
   content: string;
   helpful: number;
   createdAt: string;
+  updatedAt: string;
   user: {
     name: string;
     avatar: string;
@@ -49,8 +50,7 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
   const { data: session } = useSession();
   const [reviewsData, setReviewsData] = useState<ReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [showAddReview, setShowAddReview] = useState(false);
   const [newReview, setNewReview] = useState({
     rating: 0,
     title: "",
@@ -60,27 +60,16 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
 
   useEffect(() => {
     fetchReviews();
-  }, [projectId, page]);
+  }, [projectId]);
 
   const fetchReviews = async () => {
     try {
       const response = await fetch(
-        `/api/community/reviews?projectId=${projectId}&page=${page}&limit=10`
+        `/api/community/reviews?projectId=${projectId}`
       );
       if (response.ok) {
         const data = await response.json();
-        if (page === 1) {
-          setReviewsData(data);
-        } else {
-          setReviewsData((prev) =>
-            prev
-              ? {
-                  ...data,
-                  reviews: [...prev.reviews, ...data.reviews],
-                }
-              : data
-          );
-        }
+        setReviewsData(data);
       }
     } catch (error) {
       console.error("Error fetching reviews:", error);
@@ -115,8 +104,7 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
 
       if (response.ok) {
         setNewReview({ rating: 0, title: "", content: "" });
-        setShowReviewDialog(false);
-        setPage(1);
+        setShowAddReview(false);
         await fetchReviews();
         toast.success("Review submitted successfully!");
       } else {
@@ -133,25 +121,21 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
   const renderStars = (
     rating: number,
     interactive = false,
-    size = "w-4 h-4"
+    onRate?: (rating: number) => void
   ) => {
     return (
       <div className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={`${size} ${
+            className={`w-4 h-4 ${
               interactive ? "cursor-pointer" : ""
             } transition-colors ${
               star <= rating
                 ? "fill-yellow-400 text-yellow-400"
                 : "text-gray-300 hover:text-yellow-400"
             }`}
-            onClick={
-              interactive
-                ? () => setNewReview((prev) => ({ ...prev, rating: star }))
-                : undefined
-            }
+            onClick={interactive && onRate ? () => onRate(star) : undefined}
           />
         ))}
       </div>
@@ -167,18 +151,18 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
     });
   };
 
-  if (loading && !reviewsData) {
+  if (loading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Reviews</CardTitle>
+          <CardTitle>Community Reviews</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                <div className="h-4 bg-gray-200 rounded w-full"></div>
+              <div key={i} className="border rounded-lg p-4">
+                <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
                 <div className="h-4 bg-gray-200 rounded w-2/3"></div>
               </div>
             ))}
@@ -192,15 +176,14 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5" />
-            Reviews ({reviewsData?.totalCount || 0})
+          <CardTitle>
+            Community Reviews ({reviewsData?.totalCount || 0})
           </CardTitle>
           {session && (
-            <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
+            <Dialog open={showAddReview} onOpenChange={setShowAddReview}>
               <DialogTrigger asChild>
                 <Button size="sm">
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Plus className="w-4 h-4 mr-1" />
                   Write Review
                 </Button>
               </DialogTrigger>
@@ -213,7 +196,9 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
                     <label className="text-sm font-medium mb-2 block">
                       Rating
                     </label>
-                    {renderStars(newReview.rating, true, "w-6 h-6")}
+                    {renderStars(newReview.rating, true, (rating) =>
+                      setNewReview({ ...newReview, rating })
+                    )}
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">
@@ -223,10 +208,7 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
                       placeholder="Summarize your experience..."
                       value={newReview.title}
                       onChange={(e) =>
-                        setNewReview((prev) => ({
-                          ...prev,
-                          title: e.target.value,
-                        }))
+                        setNewReview({ ...newReview, title: e.target.value })
                       }
                     />
                   </div>
@@ -236,32 +218,21 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
                     </label>
                     <Textarea
                       placeholder="Share your detailed experience with this project..."
-                      rows={6}
                       value={newReview.content}
                       onChange={(e) =>
-                        setNewReview((prev) => ({
-                          ...prev,
-                          content: e.target.value,
-                        }))
+                        setNewReview({ ...newReview, content: e.target.value })
                       }
+                      rows={4}
                     />
                   </div>
                   <div className="flex justify-end gap-2">
                     <Button
                       variant="outline"
-                      onClick={() => setShowReviewDialog(false)}
+                      onClick={() => setShowAddReview(false)}
                     >
                       Cancel
                     </Button>
-                    <Button
-                      onClick={submitReview}
-                      disabled={
-                        submitting ||
-                        !newReview.rating ||
-                        !newReview.title ||
-                        !newReview.content
-                      }
-                    >
+                    <Button onClick={submitReview} disabled={submitting}>
                       {submitting ? "Submitting..." : "Submit Review"}
                     </Button>
                   </div>
@@ -274,7 +245,7 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
       <CardContent>
         {reviewsData?.reviews.length === 0 ? (
           <div className="text-center py-8">
-            <MessageSquare className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+            <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">No reviews yet</p>
             <p className="text-sm text-muted-foreground">
               Be the first to share your experience with this project
@@ -283,8 +254,8 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
         ) : (
           <div className="space-y-6">
             {reviewsData?.reviews.map((review) => (
-              <div key={review.id} className="border-b pb-6 last:border-b-0">
-                <div className="flex items-start gap-4">
+              <div key={review.id} className="border rounded-lg p-4">
+                <div className="flex items-start gap-3">
                   <Avatar className="w-10 h-10">
                     <AvatarImage
                       src={review.user.avatar}
@@ -294,8 +265,8 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
                       {review.user.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium">{review.user.name}</span>
                       {review.user.githubUsername && (
                         <Badge variant="secondary" className="text-xs">
@@ -306,15 +277,17 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
                         {formatDate(review.createdAt)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 mb-2">
                       {renderStars(review.rating)}
-                      <span className="text-sm font-medium">
-                        {review.rating}/5
+                      <span className="text-sm text-muted-foreground">
+                        {review.rating}/5 stars
                       </span>
                     </div>
-                    <h4 className="font-medium">{review.title}</h4>
-                    <p className="text-sm leading-relaxed">{review.content}</p>
-                    <div className="flex items-center gap-4 pt-2">
+                    <h4 className="font-medium mb-2">{review.title}</h4>
+                    <p className="text-sm leading-relaxed mb-3">
+                      {review.content}
+                    </p>
+                    <div className="flex items-center gap-4">
                       <Button variant="ghost" size="sm" className="h-8 px-2">
                         <ThumbsUp className="w-4 h-4 mr-1" />
                         Helpful ({review.helpful})
@@ -327,12 +300,8 @@ export default function ProjectReviews({ projectId }: ProjectReviewsProps) {
 
             {reviewsData?.hasMore && (
               <div className="text-center">
-                <Button
-                  variant="outline"
-                  onClick={() => setPage((prev) => prev + 1)}
-                  disabled={loading}
-                >
-                  {loading ? "Loading..." : "Load More Reviews"}
+                <Button variant="outline" onClick={fetchReviews}>
+                  Load More Reviews
                 </Button>
               </div>
             )}

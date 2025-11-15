@@ -23,7 +23,7 @@ export interface Project {
   topics: string[];
 }
 
-interface Issue {
+export interface Issue {
   id: number;
   number: number;
   title: string;
@@ -36,6 +36,15 @@ interface Issue {
   }[];
   comments: number;
   body: string;
+  difficulty?: "beginner" | "intermediate" | "advanced";
+  isGoodFirstIssue: boolean;
+  isHelpWanted: boolean;
+  estimatedTime?: string;
+  mentorAvailable?: boolean;
+  assignee?: {
+    login: string;
+    avatar_url: string;
+  } | null;
 }
 
 export interface Contributor {
@@ -204,28 +213,104 @@ export async function fetchProjectIssues(projectId: number): Promise<Issue[]> {
       owner,
       repo,
       state: "open",
-      per_page: 5,
+      per_page: 20,
       sort: "created",
     });
 
-    return issuesResponse.data.map((item: any) => ({
-      id: item.id,
-      number: item.number,
-      title: item.title,
-      html_url: item.html_url,
-      created_at: item.created_at,
-      updated_at: item.updated_at,
-      labels: item.labels.map((label: any) => ({
+    return issuesResponse.data.map((item: any) => {
+      const labels = item.labels.map((label: any) => ({
         name: label.name,
         color: label.color,
-      })),
-      comments: item.comments,
-      body: item.body || "",
-    }));
+      }));
+
+      // Determine if it's a good first issue or help wanted
+      const isGoodFirstIssue = labels.some((label) =>
+        [
+          "good first issue",
+          "good-first-issue",
+          "beginner-friendly",
+          "first-timers-only",
+        ].includes(label.name.toLowerCase())
+      );
+      const isHelpWanted = labels.some((label) =>
+        ["help wanted", "help-wanted", "hacktoberfest"].includes(
+          label.name.toLowerCase()
+        )
+      );
+
+      // Determine difficulty based on labels and issue characteristics
+      let difficulty: "beginner" | "intermediate" | "advanced" = "intermediate";
+      if (
+        isGoodFirstIssue ||
+        labels.some((l) =>
+          ["easy", "beginner", "starter"].includes(l.name.toLowerCase())
+        )
+      ) {
+        difficulty = "beginner";
+      } else if (
+        labels.some((l) =>
+          ["hard", "advanced", "complex"].includes(l.name.toLowerCase())
+        ) ||
+        item.comments > 10
+      ) {
+        difficulty = "advanced";
+      }
+
+      // Estimate time based on labels and complexity
+      let estimatedTime = "2-4 hours";
+      if (difficulty === "beginner") {
+        estimatedTime = "1-2 hours";
+      } else if (difficulty === "advanced") {
+        estimatedTime = "1-2 days";
+      }
+
+      // Check if mentor is available (based on maintainer activity)
+      const mentorAvailable = isGoodFirstIssue || isHelpWanted;
+
+      return {
+        id: item.id,
+        number: item.number,
+        title: item.title,
+        html_url: item.html_url,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        labels,
+        comments: item.comments,
+        body: item.body || "",
+        difficulty,
+        isGoodFirstIssue,
+        isHelpWanted,
+        estimatedTime,
+        mentorAvailable,
+        assignee: item.assignee
+          ? {
+              login: item.assignee.login,
+              avatar_url: item.assignee.avatar_url,
+            }
+          : null,
+      };
+    });
   } catch (error) {
     console.error("Error fetching project issues:", error);
     return [];
   }
+}
+
+// New function to fetch good first issues specifically
+export async function fetchGoodFirstIssues(
+  projectId: number
+): Promise<Issue[]> {
+  const allIssues = await fetchProjectIssues(projectId);
+  return allIssues.filter((issue) => issue.isGoodFirstIssue);
+}
+
+// New function to fetch issues by difficulty
+export async function fetchIssuesByDifficulty(
+  projectId: number,
+  difficulty: "beginner" | "intermediate" | "advanced"
+): Promise<Issue[]> {
+  const allIssues = await fetchProjectIssues(projectId);
+  return allIssues.filter((issue) => issue.difficulty === difficulty);
 }
 
 export async function fetchProjectContributors(
