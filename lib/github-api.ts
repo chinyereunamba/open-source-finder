@@ -224,7 +224,7 @@ export async function fetchProjectIssues(projectId: number): Promise<Issue[]> {
       }));
 
       // Determine if it's a good first issue or help wanted
-      const isGoodFirstIssue = labels.some((label) =>
+      const isGoodFirstIssue = labels.some((label: any) =>
         [
           "good first issue",
           "good-first-issue",
@@ -232,7 +232,7 @@ export async function fetchProjectIssues(projectId: number): Promise<Issue[]> {
           "first-timers-only",
         ].includes(label.name.toLowerCase())
       );
-      const isHelpWanted = labels.some((label) =>
+      const isHelpWanted = labels.some((label: any) =>
         ["help wanted", "help-wanted", "hacktoberfest"].includes(
           label.name.toLowerCase()
         )
@@ -242,13 +242,13 @@ export async function fetchProjectIssues(projectId: number): Promise<Issue[]> {
       let difficulty: "beginner" | "intermediate" | "advanced" = "intermediate";
       if (
         isGoodFirstIssue ||
-        labels.some((l) =>
+        labels.some((l: any) =>
           ["easy", "beginner", "starter"].includes(l.name.toLowerCase())
         )
       ) {
         difficulty = "beginner";
       } else if (
-        labels.some((l) =>
+        labels.some((l: any) =>
           ["hard", "advanced", "complex"].includes(l.name.toLowerCase())
         ) ||
         item.comments > 10
