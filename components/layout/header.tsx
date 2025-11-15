@@ -57,19 +57,22 @@ export default function Header() {
               Community
             </Link>
             {isLoggedIn && (
-              <Link
-                href="/dashboard"
-                className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                Dashboard
-              </Link>
+              <>
+                <Link
+                  href="/dashboard"
+                  className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
+                  Dashboard
+                </Link>
+
+                <Link
+                  href="/submit"
+                  className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
+                  Submit
+                </Link>
+              </>
             )}
-            <Link
-              href="/submit"
-              className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
-            >
-              Submit
-            </Link>
           </nav>
         </div>
         <div className="flex flex-1 items-center space-x-4 sm:justify-end">
