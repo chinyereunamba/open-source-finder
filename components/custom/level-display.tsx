@@ -32,7 +32,7 @@ export function LevelDisplay({
         {showExperience && (
           <div className="flex-1 min-w-0">
             <Progress value={progressPercentage} className="h-2" />
-            <div className="text-xs text-gray-600 mt-1">
+            <div className="text-xs text-text mt-1">
               {experienceInCurrentLevel} / {experienceNeededForLevel} XP
             </div>
           </div>
@@ -43,7 +43,7 @@ export function LevelDisplay({
 
   return (
     <motion.div
-      className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-100"
+      className="bg-gradient-to-br bg-card rounded-xl p-6 border"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
@@ -68,10 +68,10 @@ export function LevelDisplay({
         {/* Progress Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline justify-between mb-2">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-text">
               {getLevelTitle(stats.level)}
             </h3>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-muted-foreground">
               {stats.experienceToNextLevel} XP to next level
             </span>
           </div>
@@ -83,7 +83,7 @@ export function LevelDisplay({
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
                 animate={{
-                  x: ["-100%", "200%"],
+                  x: ["0%", "100%"],
                 }}
                 transition={{
                   duration: 2,

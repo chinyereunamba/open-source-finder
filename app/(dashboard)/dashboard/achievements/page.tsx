@@ -14,6 +14,7 @@ import { AchievementNotificationContainer } from "@/components/custom/achievemen
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AchievementsPage() {
   const { data: session } = useSession();
@@ -78,11 +79,11 @@ export default function AchievementsPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-32 bg-gray-200 rounded"></div>
+          <Skeleton className="h-8 rounded w-1/3"></Skeleton>
+          <Skeleton className="h-32 rounded"></Skeleton>
           <div className="grid grid-cols-6 gap-4">
             {[...Array(12)].map((_, i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded"></div>
+              <Skeleton key={i} className="h-24 rounded"></Skeleton>
             ))}
           </div>
         </div>
@@ -100,8 +101,8 @@ export default function AchievementsPage() {
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Achievements</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-3xl font-bold text-text">Achievements</h1>
+            <p className="text-muted-foreground mt-1">
               Track your progress and unlock badges as you contribute to open
               source
             </p>
@@ -140,7 +141,7 @@ export default function AchievementsPage() {
       >
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Unlocked
             </CardTitle>
           </CardHeader>
@@ -148,7 +149,7 @@ export default function AchievementsPage() {
             <div className="text-2xl font-bold text-green-600">
               {unlockedAchievements.length}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               {Math.round(
                 (unlockedAchievements.length / achievements.length) * 100
               )}
@@ -159,35 +160,35 @@ export default function AchievementsPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               In Progress
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-primbg-primary">
               {inProgressAchievements.length}
             </div>
-            <p className="text-xs text-gray-500">Working towards completion</p>
+            <p className="text-xs text-muted-foreground">Working towards completion</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Locked
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-600">
+            <div className="text-2xl font-bold text-muted-foreground">
               {lockedAchievements.length}
             </div>
-            <p className="text-xs text-gray-500">Ready to unlock</p>
+            <p className="text-xs text-muted-foreground">Ready to unlock</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Total XP
             </CardTitle>
           </CardHeader>
@@ -195,7 +196,7 @@ export default function AchievementsPage() {
             <div className="text-2xl font-bold text-purple-600">
               {stats.experience.toLocaleString()}
             </div>
-            <p className="text-xs text-gray-500">Experience points earned</p>
+            <p className="text-xs text-muted-foreground">Experience points earned</p>
           </CardContent>
         </Card>
       </motion.div>
@@ -217,23 +218,23 @@ export default function AchievementsPage() {
             </TabsList>
 
             {/* View Mode Toggle */}
-            <div className="flex rounded-lg border border-gray-200 p-1">
+            <div className="flex rounded-lg border bg-card p-1 ">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                className={`px-3 py-1 rounded-md text-sm cursor-pointer font-medium transition-colors ${
                   viewMode === "grid"
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-600 hover:text-gray-900"
+                    ? "bg-blue-600 text-text"
+                    : "text-muted-foreground hover:text-muted-foreground"
                 }`}
               >
                 Grid
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                className={`px-3 py-1 rounded-md text-sm cursor-pointer font-medium transition-colors ${
                   viewMode === "list"
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-600 hover:text-gray-900"
+                    ? "bg-primary text-text"
+                    : "text-muted-foreground hover:text-muted-foreground"
                 }`}
               >
                 List

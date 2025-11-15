@@ -75,23 +75,23 @@ export function AchievementsGrid({
       {/* Header with Stats */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-text flex items-center gap-2">
             {categoryIcons[selectedCategory]} {categoryLabels[selectedCategory]}
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="text-muted-foreground mt-1">
             {unlockedCount} of {totalCount} achievements unlocked
           </p>
         </div>
 
         {/* Progress Bar */}
         <div className="flex items-center gap-3">
-          <div className="w-32 bg-gray-200 rounded-full h-2">
+          <div className="w-32 bg-muted rounded-full h-2">
             <div
               className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500"
               style={{ width: `${(unlockedCount / totalCount) * 100}%` }}
             />
           </div>
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-text">
             {Math.round((unlockedCount / totalCount) * 100)}%
           </span>
         </div>
@@ -109,7 +109,7 @@ export function AchievementsGrid({
               "px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2",
               selectedCategory === category
                 ? "bg-blue-600 text-white shadow-lg"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                : "bg-secondary text-text hover:bg-gray-200"
             )}
           >
             <span>{categoryIcons[category]}</span>
@@ -140,6 +140,7 @@ export function AchievementsGrid({
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.05, duration: 0.3 }}
               layout
+            className="grid place-items-center bg-card p-6 rounded-md"
             >
               <div className="text-center space-y-2">
                 <AchievementBadge
@@ -149,7 +150,7 @@ export function AchievementsGrid({
                   onClick={() => onAchievementClick?.(achievement)}
                 />
                 <div>
-                  <h4 className="font-medium text-sm text-gray-900 truncate">
+                  <h4 className="font-medium text-sm text-text truncate">
                     {achievement.title}
                   </h4>
                   {showProgress && !achievement.isUnlocked && (
@@ -189,10 +190,10 @@ export function AchievementsGrid({
           transition={{ duration: 0.5 }}
         >
           <div className="text-6xl mb-4">🎯</div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3 className="text-lg font-semibold text-text mb-2">
             No achievements in this category yet
           </h3>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Start contributing to projects to unlock your first achievements!
           </p>
         </motion.div>
@@ -235,7 +236,7 @@ export function AchievementsPreview({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-lg font-semibold text-text">
           Recent Achievements
         </h3>
         {onViewAll && (
@@ -256,7 +257,7 @@ export function AchievementsPreview({
               size="md"
               showProgress={true}
             />
-            <p className="text-xs text-gray-600 mt-1 truncate">
+            <p className="text-xs text-muted-foreground mt-1 truncate">
               {achievement.title}
             </p>
           </div>
@@ -264,7 +265,7 @@ export function AchievementsPreview({
       </div>
 
       {displayAchievements.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-muted-foreground">
           <div className="text-4xl mb-2">🎯</div>
           <p>Start exploring to unlock achievements!</p>
         </div>

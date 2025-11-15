@@ -57,7 +57,7 @@ export function AchievementBadge({
           "relative rounded-full border-4 flex items-center justify-center",
           sizeClasses[size],
           isLocked
-            ? "bg-gray-200 border-gray-300 opacity-50 grayscale"
+            ? "bg-card border-gray-300 opacity-50 grayscale"
             : `bg-gradient-to-br ${rarityColors[achievement.rarity]} ${
                 rarityBorders[achievement.rarity]
               }`
