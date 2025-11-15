@@ -21,6 +21,7 @@ import {
   Settings,
   LogOut,
   LayoutDashboard,
+  BarChart3,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 
@@ -122,6 +123,24 @@ export default function Header() {
                     <Link href="/dashboard">
                       <LayoutDashboard className="mr-2 h-4 w-4" />
                       <span>Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/contributions">
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      <span>Contributions</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/achievements">
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      <span>Achievements</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/test-achievements">
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      <span>Test Achievements</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>

@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAchievementNotificationContext } from "@/components/providers/achievement-notification-provider";
 import {
   Star,
   GitFork,
@@ -79,24 +80,37 @@ export default function EnhancedProjectCard({
 }: EnhancedProjectCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [bookmarked, setBookmarked] = useState(isBookmarked);
+  const { trackBookmark, trackShare, trackProjectView } =
+    useAchievementNotificationContext();
 
   const handleBookmark = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setBookmarked(!bookmarked);
     onBookmark?.(project.id);
+
+    // Track achievement
+    if (!bookmarked) {
+      trackBookmark(project.id);
+    }
   };
 
   const handleShare = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onShare?.(project);
+
+    // Track achievement
+    trackShare(project.id);
   };
 
   const handleQuickView = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onQuickView?.(project);
+
+    // Track achievement
+    trackProjectView(project.id);
   };
 
   const formatNumber = (num: number): string => {

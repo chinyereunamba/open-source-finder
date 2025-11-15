@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { UserInterestTracker } from "@/lib/user-interests";
+import { useAchievementNotificationContext } from "@/components/providers/achievement-notification-provider";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -55,13 +56,17 @@ export default function EnhancedProjectDetail({
   const userId = session?.user?.email || "";
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const { trackBookmark, trackShare, trackProjectView } =
+    useAchievementNotificationContext();
 
   // Track project view on mount
   useEffect(() => {
     if (userId && project.id) {
       UserInterestTracker.trackProjectView(userId, project.id);
+      // Track achievement
+      trackProjectView(project.id);
     }
-  }, [userId, project.id]);
+  }, [userId, project.id, trackProjectView]);
 
   // Check if project is bookmarked
   useEffect(() => {
@@ -84,6 +89,11 @@ export default function EnhancedProjectDetail({
       project.id,
       newBookmarkState
     );
+
+    // Track achievement
+    if (newBookmarkState) {
+      trackBookmark(project.id);
+    }
   };
 
   const handleShare = () => {
@@ -97,6 +107,9 @@ export default function EnhancedProjectDetail({
       navigator.clipboard.writeText(window.location.href);
       // TODO: Show toast notification
     }
+
+    // Track achievement
+    trackShare(project.id);
   };
 
   const getDifficultyLevel = () => {

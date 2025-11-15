@@ -25,16 +25,22 @@ import UserContributions from "@/components/custom/user-contributions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BookmarkedProjects from "@/components/custom/bookmarked-projects";
 import ContributionStreak from "@/components/custom/contribution-streak";
+import ContributionNotifications from "@/components/custom/contribution-notifications";
+import ContributionAnalytics from "@/components/custom/contribution-analytics";
 import DashboardStats from "@/components/custom/dashboard-stats";
 import { AchievementsPreview } from "@/components/custom/achievements-grid";
 import { LevelDisplay } from "@/components/custom/level-display";
-import { AchievementSystem } from "@/lib/achievement-system";
+import {
+  AchievementSystem,
+  UserAchievement,
+  UserStats,
+} from "@/lib/achievement-system";
 import { useState, useEffect } from "react";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
-  const [achievements, setAchievements] = useState([]);
-  const [stats, setStats] = useState(null);
+  const [achievements, setAchievements] = useState<UserAchievement[]>([]);
+  const [stats, setStats] = useState<UserStats | null>(null);
 
   const userId = session?.user?.email || "demo-user";
 
@@ -143,8 +149,22 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+        {/* Contribution Notifications */}
+        <div className="mb-8">
+          <ContributionNotifications />
+        </div>
+
         {/* Contribution Streak */}
         <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Contribution Activity</h2>
+            <Link href="/dashboard/contributions">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Calendar className="h-4 w-4" />
+                View Details
+              </Button>
+            </Link>
+          </div>
           <ContributionStreak />
         </div>
 
@@ -210,6 +230,11 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Contribution Analytics */}
+        <div className="mt-8">
+          <ContributionAnalytics />
         </div>
       </div>
     </PageTransition>
