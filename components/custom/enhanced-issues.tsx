@@ -403,10 +403,12 @@ export default function EnhancedIssues({ projectId }: EnhancedIssuesProps) {
                       <div className="flex flex-col items-end gap-2">
                         <Badge
                           className={`${getDifficultyColor(
-                            issue.difficulty
+                            issue?.difficulty || "intermediate"
                           )} flex items-center gap-1`}
                         >
-                          {getDifficultyIcon(issue.difficulty)}
+                          {getDifficultyIcon(
+                            issue?.difficulty || "intermediate"
+                          )}
                           {issue.difficulty}
                         </Badge>
 
