@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline - OSS Finder</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #0e0e52 0%, #150578 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        text-align: center;
+        max-width: 500px;
+      }
+
+      .icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 30px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 60px;
+      }
+
+      h1 {
+        font-size: 32px;
+        margin-bottom: 16px;
+        font-weight: 700;
+      }
+
+      p {
+        font-size: 18px;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        opacity: 0.9;
+      }
+
+      .button {
+        display: inline-block;
+        padding: 12px 32px;
+        background: white;
+        color: #0e0e52;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .features {
+        margin-top: 40px;
+        padding-top: 40px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .features h2 {
+        font-size: 20px;
+        margin-bottom: 20px;
+      }
+
+      .features ul {
+        list-style: none;
+        text-align: left;
+        display: inline-block;
+      }
+
+      .features li {
+        padding: 8px 0;
+        opacity: 0.8;
+      }
+
+      .features li:before {
+        content: "✓ ";
+        margin-right: 8px;
+        color: #9eb25d;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">📡</div>
+      <h1>You're Offline</h1>
+      <p>
+        It looks like you've lost your internet connection. Don't worry, some
+        features are still available offline!
+      </p>
+      <a
+        href="/"
+        class="button"
+        onclick="window.location.reload(); return false;"
+      >
+        Try Again
+      </a>
+
+      <div class="features">
+        <h2>Available Offline:</h2>
+        <ul>
+          <li>Browse cached projects</li>
+          <li>View saved bookmarks</li>
+          <li>Read project details</li>
+          <li>Access your profile</li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      // Auto-retry when connection is restored
+      window.addEventListener("online", () => {
+        window.location.reload();
+      });
+    </script>
+  </body>
+</html>

@@ -48,7 +48,7 @@ export default function InfiniteScrollProjects({
   const observerTarget = useRef<HTMLDivElement>(null);
 
   // Load initial projects
-  const loadInitialProjects = async () => {
+  const loadInitialProjects = useCallback(async () => {
     setLoading(true);
     setError(null);
     setPage(1);
@@ -73,56 +73,92 @@ export default function InfiniteScrollProjects({
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, language, JSON.stringify(topics)]);
 
   useEffect(() => {
     loadInitialProjects();
-  }, [search, language, topics]);
+  }, [loadInitialProjects]);
 
   // Load more projects
   const loadMore = useCallback(async () => {
-    if (loadingMore || !hasMore) return;
+    if (loadingMore || !hasMore) {
+      console.log("⏸️ InfiniteScroll - Skipping loadMore:", {
+        loadingMore,
+        hasMore,
+      });
+      return;
+    }
 
+    console.log("📥 InfiniteScroll - Loading more, current page:", page);
     setLoadingMore(true);
     try {
       const nextPage = page + 1;
       const data = await fetchProjects(nextPage, search, language, topics);
+      console.log(
+        "✅ InfiniteScroll - Loaded page",
+        nextPage,
+        ":",
+        data.length,
+        "projects"
+      );
 
       if (data.length === 0) {
         setHasMore(false);
+        console.log("🏁 InfiniteScroll - No more projects to load");
       } else {
-        setProjects((prev) => [...prev, ...data]);
+        setProjects((prev) => {
+          const newProjects = [...prev, ...data];
+          console.log(
+            "📊 InfiniteScroll - Total projects:",
+            newProjects.length
+          );
+          return newProjects;
+        });
         setPage(nextPage);
         setHasMore(data.length === 20);
       }
     } catch (error) {
-      console.error("Error loading more projects:", error);
+      console.error("❌ InfiniteScroll - Error loading more projects:", error);
       toast.error("Failed to load more projects");
     } finally {
       setLoadingMore(false);
     }
-  }, [page, search, language, topics, loadingMore, hasMore]);
+  }, [page, search, language, JSON.stringify(topics), loadingMore, hasMore]);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
+    const currentTarget = observerTarget.current;
+    if (!currentTarget) {
+      console.log("⚠️ InfiniteScroll - Observer target not found");
+      return;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+        const entry = entries[0];
+        console.log("👁️ InfiniteScroll - Observer triggered:", {
+          isIntersecting: entry.isIntersecting,
+          hasMore,
+          loadingMore,
+        });
+
+        if (entry.isIntersecting && hasMore && !loadingMore) {
+          console.log("🚀 InfiniteScroll - Triggering loadMore");
           loadMore();
         }
       },
-      { threshold: 0.1 }
+      {
+        threshold: 0.1,
+        rootMargin: "100px", // Start loading before reaching the bottom
+      }
     );
 
-    const currentTarget = observerTarget.current;
-    if (currentTarget) {
-      observer.observe(currentTarget);
-    }
+    console.log("👀 InfiniteScroll - Setting up observer");
+    observer.observe(currentTarget);
 
     return () => {
-      if (currentTarget) {
-        observer.unobserve(currentTarget);
-      }
+      console.log("🧹 InfiniteScroll - Cleaning up observer");
+      observer.unobserve(currentTarget);
     };
   }, [loadMore, hasMore, loadingMore]);
 
@@ -219,15 +255,17 @@ export default function InfiniteScrollProjects({
         </motion.div>
       </AnimatePresence>
 
-      {/* Loading more indicator */}
-      {loadingMore && (
-        <div className="flex justify-center py-8">
-          <LoadingSpinner size="md" text="Loading more projects..." />
+      {/* Intersection observer target - placed before loading indicator */}
+      {!loading && projects.length > 0 && hasMore && (
+        <div
+          ref={observerTarget}
+          className="h-20 flex items-center justify-center"
+        >
+          {loadingMore && (
+            <LoadingSpinner size="md" text="Loading more projects..." />
+          )}
         </div>
       )}
-
-      {/* Intersection observer target */}
-      <div ref={observerTarget} className="h-4" />
 
       {/* End of results message */}
       {!hasMore && projects.length > 0 && (

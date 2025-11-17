@@ -11,6 +11,9 @@ import Header from "../components/layout/header";
 import { getServerSession } from "next-auth";
 import { AchievementNotificationProvider } from "@/components/providers/achievement-notification-provider";
 import { GlobalAchievementNotifications } from "@/components/custom/global-achievement-notifications";
+import MobileBottomNav from "@/components/layout/mobile-bottom-nav";
+import PWAInstallPrompt from "@/components/custom/pwa-install-prompt";
+import OfflineIndicator from "@/components/custom/offline-indicator";
 export const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -45,9 +48,12 @@ export default async function RootLayout({
           <AchievementNotificationProvider>
             {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange> */}
             <ServiceWorkerRegistration />
+            <OfflineIndicator />
             <Header />
-            {children}
+            <div className="pb-16 md:pb-0">{children}</div>
             <Footer />
+            <MobileBottomNav />
+            <PWAInstallPrompt />
             <Toaster />
             <GlobalAchievementNotifications />
             <Analytics />

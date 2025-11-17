@@ -77,3 +77,17 @@ export {
 
 export { RecommendationPreferences } from "./recommendation-preferences";
 export { default as RecommendedProjects } from "./recommended-projects";
+export { default as AdvancedSearchDiscovery } from "./advanced-search-discovery";
+export { default as TrendingDashboard } from "./trending-dashboard";
+export { default as SimilarProjectsEnhanced } from "./similar-projects-enhanced";
+export { AnalyticsDashboard } from "./analytics-dashboard";
+export { ProjectPopularityStats } from "./project-popularity-stats";
+export { CommunityHealthIndicator } from "./community-health-indicator";
+export { MaintainerAnalyticsDashboard } from "./maintainer-analytics-dashboard";
+
+// Mobile-specific components
+export { default as MobileProjectCard } from "./mobile-project-card";
+export { default as MobileSearch } from "./mobile-search";
+export { default as PullToRefresh } from "./pull-to-refresh";
+export { default as OfflineIndicator } from "./offline-indicator";
+export { default as PWAInstallPrompt } from "./pwa-install-prompt";

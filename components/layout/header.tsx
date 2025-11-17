@@ -24,20 +24,29 @@ import {
   BarChart3,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
+import MobileNav from "./mobile-nav";
+import MobileSearch from "@/components/custom/mobile-search";
 
 export default function Header() {
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const { data: session, status } = useSession();
   const isLoggedIn = !!session;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background">
+    <header className="sticky top-0 z-40 w-full border-b backdrop-blur-sm bg-background/95">
       <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0 mx-auto">
-        <div className="flex gap-6 md:gap-10">
+        <div className="flex items-center gap-2">
+          <MobileNav />
           <Link href="/" className="flex items-center space-x-2">
             <Github className="h-6 w-6" />
-            <span className="inline-block font-bold">OpenSourceFinder</span>
+            <span className="font-bold hidden sm:inline-block">
+              OpenSourceFinder
+            </span>
+            <span className="font-bold sm:hidden">OSS</span>
           </Link>
-          <nav className="flex gap-6">
+        </div>
+        <div className="flex gap-6 md:gap-10">
+          <nav className="hidden md:flex gap-6">
             <Link
               href="/"
               className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
@@ -49,6 +58,12 @@ export default function Header() {
               className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
             >
               Projects
+            </Link>
+            <Link
+              href="/discover"
+              className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Discover
             </Link>
             <Link
               href="/community"
@@ -75,8 +90,8 @@ export default function Header() {
             )}
           </nav>
         </div>
-        <div className="flex flex-1 items-center space-x-4 sm:justify-end">
-          <div className="flex-1 sm:grow-0 sm:w-72">
+        <div className="flex flex-1 items-center space-x-2 sm:space-x-4 sm:justify-end">
+          <div className="flex-1 sm:grow-0 sm:w-72 hidden sm:block">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -86,9 +101,25 @@ export default function Header() {
               />
             </div>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="sm:hidden"
+            onClick={() => setMobileSearchOpen(true)}
+          >
+            <Search className="h-5 w-5" />
+          </Button>
+          <MobileSearch
+            open={mobileSearchOpen}
+            onOpenChange={setMobileSearchOpen}
+          />
           {isLoggedIn ? (
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" className="relative">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative hidden sm:flex"
+              >
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-1 right-1 flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -96,7 +127,7 @@ export default function Header() {
                 </span>
               </Button>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                <DropdownMenuTrigger asChild className="hidden md:flex">
                   <Button
                     variant="ghost"
                     className="relative h-8 w-8 rounded-full"
@@ -181,7 +212,7 @@ export default function Header() {
               </DropdownMenu>
             </div>
           ) : (
-            <Button asChild>
+            <Button asChild className="hidden md:flex">
               <Link href="/auth/sign-in">Sign In</Link>
             </Button>
           )}

@@ -21,7 +21,8 @@ const defaultFilters: FilterOptions = {
 
 export default function ProjectsPage() {
   const searchParams = useSearchParams();
-  const useInfiniteScroll = searchParams.get("infinite") === "true";
+  // Default to infinite scroll unless explicitly disabled
+  const useInfiniteScroll = searchParams.get("pagination") !== "true";
 
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");

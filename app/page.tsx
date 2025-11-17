@@ -6,6 +6,7 @@ import SearchBarHome from "@/components/SearchBarHome";
 import Features from "@/components/layout/features";
 import EnhancedHowItWorks from "@/components/layout/enhanced-how-it-works";
 import HeroSection from "@/components/layout/hero-section";
+import TrendingDashboard from "@/components/custom/trending-dashboard";
 import { Button } from "@/components/custom";
 import { FadeTransition } from "@/components/ui/page-transition";
 
@@ -48,6 +49,26 @@ export default function Home() {
 
           {/* Enhanced How It Works Section */}
           <EnhancedHowItWorks />
+
+          {/* Trending Projects Section */}
+          <section className="py-24 bg-muted/30">
+            <div className="container mx-auto px-4">
+              <div className="flex items-center justify-between mb-12">
+                <div>
+                  <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                    Trending Projects
+                  </h2>
+                  <p className="text-xl text-muted-foreground leading-relaxed">
+                    Discover what's hot in the open source community
+                  </p>
+                </div>
+                <Button variant="outline" className="hidden md:inline-flex">
+                  <Link href="/discover">Explore More</Link>
+                </Button>
+              </div>
+              <TrendingDashboard showSummary={false} />
+            </div>
+          </section>
 
           {/* Search Section */}
           <section className="py-24">
